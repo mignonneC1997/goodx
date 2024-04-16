@@ -1,0 +1,7 @@
+{
+    "/api": {
+      "target": "https://dev_interview.qagoodx.co.za",
+      "secure": false,
+      "changeOrigin": true
+    }
+  }
