@@ -1,10 +1,5 @@
-<ion-header>
-  <ion-toolbar>
-    <ion-title>Login</ion-title>
-  </ion-toolbar>
-</ion-header>
-
 <ion-content class="ion-padding">
+  <ion-img src="../assets/images/logo.png"></ion-img>
   <form [formGroup]="loginForm" (ngSubmit)="login()">
     <ion-item>
       <ion-label position="floating">Username</ion-label>
@@ -22,6 +17,6 @@
       <p>Please enter a valid password.</p>
     </ion-item> -->
 
-    <ion-button expand="block" type="submit" [disabled]="loginForm.invalid">Login</ion-button>
+    <ion-button expand="block" type="submit" [disabled]="loginForm.invalid" color="success">Login</ion-button>
   </form>
 </ion-content>
