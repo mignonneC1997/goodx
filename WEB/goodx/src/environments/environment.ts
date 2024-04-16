@@ -4,8 +4,7 @@
 
 export const environment = {
   production: false,
-  url: '/api/session',
-  url2: '/api/patient?fields=["entity_uid","id","debtor_uid","name","surname","initials","title","date_of_birth","mobile_no","gender","benefit_check"]'
+  url: '/api/',
 };
 
 /*

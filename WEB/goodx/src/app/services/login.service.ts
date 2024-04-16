@@ -14,7 +14,7 @@ export class LoginService {
   constructor(private http: HttpClient, private httpHeaderService: HttpHeaderService) { }
 
   public login = (data: any): Observable<any> => {
-    return this.http.post<any>(environment.url, data, { headers: this.httpHeaderService.getHTTPHeaders() }).pipe(
+    return this.http.post<any>(environment.url + 'session', data, { headers: this.httpHeaderService.getHTTPHeaders() }).pipe(
       map((response: HttpResponse<any>) => {
         return response;
       }), catchError((error: HttpErrorResponse) => {
