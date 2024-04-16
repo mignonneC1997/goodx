@@ -44,7 +44,7 @@ export class LoginPage implements OnInit {
       this.loginApi.login(data).pipe(takeUntil(this.destroy$)).subscribe({
         next: (response) => {
           this.toasterService.displaySuccessToast('successfully logged in');
-          this.router.navigate(['/home']);
+          this.router.navigate(['/dashboard']);
         },
         error: (err: ErrorEvent) => {
           this.toasterService.displayErrorToast(err.error.status);
