@@ -10,7 +10,7 @@ Application which can be used by medical staff (e.g. a doctor or nurse) to get a
 ## Installation
 
 ```bash
-git clone https://github.com/mignonneC1997/goodx
+git clone https://github.com/mignonneC1997/goodx.git
 cd goodx
 ```
 
