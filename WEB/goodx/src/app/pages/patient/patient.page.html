@@ -15,13 +15,23 @@
 </ion-header>
 
 <ion-content [fullscreen]="true">
-  <ion-list *ngIf="users">
-    <ion-item *ngFor="let user of users">
+  <ion-list>
+    <ion-item *ngFor="let user of users" class="user-item">
+      <ion-avatar slot="start">
+        <!-- Display different avatar images based on user's gender -->
+        <ng-container *ngIf="user.gender === 'male'">
+          <img src="../../../assets/images/male.png" alt="Male Avatar">
+        </ng-container>
+        <ng-container *ngIf="user.gender === 'female'">
+          <img src="../../../assets/images/male.png" alt="Female Avatar">
+        </ng-container>
+      </ion-avatar>
       <ion-label>
         <h2>{{ user.name }} {{ user.surname }}</h2>
-        <p>Title: {{ user.title }}</p>
-        <p>Date of Birth: {{ user.date_of_birth }}</p>
-        <p>Mobile No: {{ user.mobile_no }}</p>
+        <p class="user-info">Title: {{ user.title }}</p>
+        <p class="user-info">Date of Birth: {{ user.date_of_birth }}</p>
+        <p class="user-info">Mobile No: {{ user.mobile_no }}</p>
+        <!-- Add more user details here as needed -->
       </ion-label>
     </ion-item>
   </ion-list>
