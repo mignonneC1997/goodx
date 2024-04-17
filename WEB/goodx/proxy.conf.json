@@ -1,7 +1,14 @@
+
 {
-    "/api": {
-      "target": "https://dev_interview.qagoodx.co.za",
-      "secure": false,
-      "changeOrigin": true
+  "/api": {
+    "target": "https://dev_interview.qagoodx.co.za",
+    "secure": false,
+    "changeOrigin": true,
+    "pathRewrite":{
+      "^/api/(.*)$": "https://dev_interview.qagoodx.co.za/api/$1"
     }
   }
+}
+
+
+
