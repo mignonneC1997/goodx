@@ -1,0 +1,28 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="dashboard()">
+        <ion-icon slot="icon-only" name="calendar"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center">Patients</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="logout()">
+        <ion-icon slot="icon-only" name="log-out"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-list *ngIf="users">
+    <ion-item *ngFor="let user of users">
+      <ion-label>
+        <h2>{{ user.name }} {{ user.surname }}</h2>
+        <p>Title: {{ user.title }}</p>
+        <p>Date of Birth: {{ user.date_of_birth }}</p>
+        <p>Mobile No: {{ user.mobile_no }}</p>
+      </ion-label>
+    </ion-item>
+  </ion-list>
+</ion-content>

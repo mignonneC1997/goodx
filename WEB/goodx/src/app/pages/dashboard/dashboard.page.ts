@@ -52,4 +52,8 @@ export class DashboardPage implements OnInit {
     this.router.navigate(['/login']);
   }
 
+  patients() {
+    this.router.navigate(['/patient']);
+  }
+
 }

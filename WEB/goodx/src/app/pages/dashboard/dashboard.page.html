@@ -1,5 +1,10 @@
 <ion-header>
   <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="patients()">
+        <ion-icon slot="icon-only" name="people"></ion-icon>
+      </ion-button>
+    </ion-buttons>
     <ion-title class="ion-text-center">Diary</ion-title>
     <ion-buttons slot="end">
       <ion-button (click)="logout()">
