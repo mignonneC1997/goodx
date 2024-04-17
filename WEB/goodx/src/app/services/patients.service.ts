@@ -14,7 +14,7 @@ export class PatientsService {
   constructor(private http: HttpClient, private httpHeaderService: HttpHeaderService) { }
 
   public patientsWeb = (): Observable<any> => {
-      return this.http.get<any>(environment.url + 'patient?fields=["entity_uid","id","debtor_uid","name","surname","initials","title","date_of_birth","mobile_no","gender","benefit_check"]', { headers: this.httpHeaderService.getHTTPHeaders(), observe: 'response' }).pipe(
+      return this.http.get<any>(environment.urlWeb + 'patient?fields=["entity_uid","id","debtor_uid","name","surname","initials","title","date_of_birth","mobile_no","gender","benefit_check"]', { headers: this.httpHeaderService.getHTTPHeaders(), observe: 'response' }).pipe(
       map((response: HttpResponse<any>) => {
         return response.body;
       }), catchError((error: HttpErrorResponse) => {
@@ -24,7 +24,7 @@ export class PatientsService {
   }
 
   public patientsNative = (): Observable<any> => {
-    const url = 'https://dev_interview.qagoodx.co.za/api/patient?fields=["entity_uid","id","debtor_uid","name","surname","initials","title","date_of_birth","mobile_no","gender","benefit_check"]';
+    const url = environment.urlNative + 'patient?fields=["entity_uid","id","debtor_uid","name","surname","initials","title","date_of_birth","mobile_no","gender","benefit_check"]';
     const options: HttpOptions = {
       headers: {
         'Content-Type': 'application/json',

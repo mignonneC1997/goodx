@@ -47,7 +47,7 @@ export class PatientPage implements OnInit {
   if (Capacitor.getPlatform() === 'web') {
     this.patientsApi.patientsWeb().pipe(takeUntil(this.destroy$)).subscribe({
       next: (response) => {
-        this.users = response.data
+        this.users = response.data;
       },
       error: (err: ErrorEvent) => {
         this.toasterService.displayErrorToast(err.error.status);
@@ -60,7 +60,8 @@ export class PatientPage implements OnInit {
     this.patientsApi.patientsNative().pipe(takeUntil(this.destroy$)).subscribe({
       next: (response) => {  
         if (response.data.status === 'OK') {
-          console.log(response);
+          console.log(response.data.data);
+          this.users = response.data.data;
         } else {
           this.toasterService.displayErrorToast(response.data.status);
         }

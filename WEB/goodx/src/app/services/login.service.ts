@@ -15,7 +15,7 @@ export class LoginService {
   constructor(private http: HttpClient, private httpHeaderService: HttpHeaderService) { }
 
   public loginWeb = (data:any): Observable<any> => {
-      return this.http.post<any>(environment.url + 'session', data, { headers: this.httpHeaderService.getHTTPHeaders(), observe: 'response' }).pipe(
+      return this.http.post<any>(environment.urlWeb + 'session', data, { headers: this.httpHeaderService.getHTTPHeaders(), observe: 'response' }).pipe(
       map((response: HttpResponse<any>) => {
         return response.body;
       }), catchError((error: HttpErrorResponse) => {
@@ -25,8 +25,7 @@ export class LoginService {
   }
 
   public loginNative = (object:any): Observable<any> => {
-    console.log('native');
-    const url = 'https://dev_interview.qagoodx.co.za/api/session';
+    const url = environment.urlNative + 'session';
     const options: HttpOptions = {
       headers: {
         'Content-Type': 'application/json',

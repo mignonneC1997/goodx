@@ -1,4 +1,5 @@
 export const environment = {
   production: true,
-  url: '/api/',
+  urlWeb: '/api/',
+  urlNative: 'https://dev_interview.qagoodx.co.za/api/'
 };
