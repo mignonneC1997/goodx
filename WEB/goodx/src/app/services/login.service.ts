@@ -48,9 +48,6 @@ export class LoginService {
           observer.error(error);  // Emit the error
         }));
     });
-
-    //return from(Http.post(options))
   }
-
 
 }
