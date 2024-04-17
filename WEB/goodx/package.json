@@ -37,6 +37,7 @@
     "@ionic/storage-angular": "^4.0.0",
     "cordova-plugin-file": "^8.0.1",
     "crypto-js": "^4.2.0",
+    "date-fns": "^3.0.5",
     "ionic6-calendar": "^1.0.1",
     "ionicons": "^7.0.0",
     "rxjs": "~7.8.0",

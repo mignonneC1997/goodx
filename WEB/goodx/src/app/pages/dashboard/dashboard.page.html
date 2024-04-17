@@ -1,3 +1,4 @@
+
 <ion-header>
   <ion-toolbar>
     <ion-buttons slot="start">
@@ -42,11 +43,60 @@
   (onTitleChanged)="viewTitle = $event"
   [startingDayWeek]="1"
   [startHour]="7"
-  [endHour]="20"> </calendar>
+  [endHour]="20"
+  (onTimeSelected)="onTimeSelected($event)"> </calendar>
 
-  <ion-fab vertical="bottom" horizontal="end" slot="fixed">
-    <ion-fab-button>
-      <ion-icon slot="icon-only" name="add"></ion-icon>
+  <ion-fab horizontal="center" vertical="bottom" horizontal="end" slot="fixed" >
+    <ion-fab-button id="inputmodel">
+      <ion-icon name="add"></ion-icon>
     </ion-fab-button>
-  </ion-fab> 
+  </ion-fab>
+  <ion-modal #modal
+  trigger="inputmodel"
+  [presentingElement]="presentingElement">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-buttons slot="start">
+            <ion-button (click)="modal.dismiss()" >Cancel
+            </ion-button>
+          </ion-buttons>
+          <ion-buttons slot="end">
+            <ion-button (click)="modal.dismiss()" [disabled]="!newBooking.title">Add
+            </ion-button>
+          </ion-buttons>
+          <ion-title class="ion-text-center">New Booking</ion-title>
+        </ion-toolbar>
+      </ion-header>
+      <ion-content class="ion-padding modal">
+        <div class="group">
+          <ion-input type="text" [(ngModel)]="newBooking.title" placeholder="Title"/>
+        </div>
+        <div class="group">
+          <ion-item>
+            <ion-label>
+              All Day
+            </ion-label>
+            <ion-toggle [(ngModel)]="newBooking.allDay"></ion-toggle>
+          </ion-item>
+          <ion-item (click)="showStart = !showStart">
+            <ion-label>Starts</ion-label>
+            <ion-text slot="end">{{formattedStart}}</ion-text>
+          </ion-item>
+          <ion-datetime #start *ngIf="showStart"
+          [value]="newBooking.startTime"
+          [presentation]="newBooking.allDay ? 'date' : 'time-date'"></ion-datetime>
+
+          <ion-item (click)="showEnd = !showEnd">
+            <ion-label>Ends</ion-label>
+            <ion-text slot="end">{{formattedEnd}}</ion-text>
+          </ion-item>
+          <ion-datetime #end *ngIf="showEnd" 
+          [value]="newBooking.endTime"
+          [presentation]="newBooking.allDay ? 'date' : 'time-date'"></ion-datetime>
+        </div>
+      </ion-content>
+    </ng-template>
+    
+  </ion-modal>
 </ion-content>
