@@ -19,4 +19,9 @@
 
     <ion-button expand="block" type="submit" [disabled]="loginForm.invalid" color="success">Login</ion-button>
   </form>
+
+  <!-- LOADING SPINNER -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <ion-spinner></ion-spinner>
+  </div>
 </ion-content>

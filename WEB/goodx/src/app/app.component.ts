@@ -1,4 +1,6 @@
 import { Component } from '@angular/core';
+import { BookingsService } from './services/bookings.service';
+import { StorageService } from './services/storage.service';
 
 @Component({
   selector: 'app-root',
@@ -6,5 +8,7 @@ import { Component } from '@angular/core';
   styleUrls: ['app.component.scss'],
 })
 export class AppComponent {
-  constructor() {}
+  constructor(private storageService: StorageService) {
+    storageService.initStorage();
+  }
 }

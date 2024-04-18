@@ -24,3 +24,21 @@
 @import "@ionic/angular/css/text-alignment.css";
 @import "@ionic/angular/css/text-transformation.css";
 @import "@ionic/angular/css/flex-utils.css";
+
+@import 'swiper/scss';
+@import '@ionic/angular/css/ionic-swiper';
+
+.calendar-event {
+    width: 100% !important;
+}
+
+    .monthview-primary-with-event {
+    background-color: var(--ion-color-light) !important;
+    color:black !important;
+}
+
+
+.monthview-selected {
+    background-color: var(--ion-color-primary)!important;
+    color: #fff !important;
+}

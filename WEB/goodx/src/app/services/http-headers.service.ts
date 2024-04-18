@@ -11,7 +11,8 @@ export class HttpHeaderService {
   public getHTTPHeaders = () => {
     const httpHeader = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Accept': '*/*'
+      'Accept': '*/*',
+      'Access-Control-Allow-Origin': '*'
     });
     return httpHeader;
   }

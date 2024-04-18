@@ -9,13 +9,12 @@ import { Http, HttpOptions } from '@capacitor-community/http';
 @Injectable({
   providedIn: 'root'
 })
-
-export class LoginService {
+export class PatientsService {
 
   constructor(private http: HttpClient, private httpHeaderService: HttpHeaderService) { }
 
-  public loginWeb = (data:any): Observable<any> => {
-      return this.http.post<any>(environment.urlWeb + 'session', data, { headers: this.httpHeaderService.getHTTPHeaders(), observe: 'response' }).pipe(
+  public patientsWeb = (): Observable<any> => {
+      return this.http.get<any>(environment.urlWeb + 'patient?fields=["entity_uid","id","debtor_uid","name","surname","initials","title","date_of_birth","mobile_no","gender","benefit_check"]', { headers: this.httpHeaderService.getHTTPHeaders(), observe: 'response' }).pipe(
       map((response: HttpResponse<any>) => {
         return response.body;
       }), catchError((error: HttpErrorResponse) => {
@@ -24,8 +23,8 @@ export class LoginService {
       ); 
   }
 
-  public loginNative = (object:any): Observable<any> => {
-    const url = environment.urlNative + 'session';
+  public patientsNative = (): Observable<any> => {
+    const url = environment.urlNative + 'patient?fields=["entity_uid","id","debtor_uid","name","surname","initials","title","date_of_birth","mobile_no","gender","benefit_check"]';
     const options: HttpOptions = {
       headers: {
         'Content-Type': 'application/json',
@@ -33,12 +32,11 @@ export class LoginService {
         'Access-Control-Allow-Origin': '*'
       },
       url,
-      method: 'POST',
-      data: object
+      method: 'GET'
     }
 
     return new Observable(observer => {
-      from(Http.post(options)
+      from(Http.get(options)
         .then(response => {
           observer.next(response); // Emit the response
           observer.complete();    // Complete the Observable
@@ -48,5 +46,4 @@ export class LoginService {
         }));
     });
   }
-
 }

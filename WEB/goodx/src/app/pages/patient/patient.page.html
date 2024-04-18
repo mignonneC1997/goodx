@@ -1,0 +1,43 @@
+<ion-header>
+  <ion-toolbar>
+    <ion-buttons slot="start">
+      <ion-button (click)="dashboard()">
+        <ion-icon slot="icon-only" name="calendar"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+    <ion-title class="ion-text-center">Patients</ion-title>
+    <ion-buttons slot="end">
+      <ion-button (click)="logout()">
+        <ion-icon slot="icon-only" name="log-out"></ion-icon>
+      </ion-button>
+    </ion-buttons>
+  </ion-toolbar>
+</ion-header>
+
+<ion-content [fullscreen]="true">
+  <ion-list>
+    <ion-item *ngFor="let user of users" class="user-item">
+      <ion-avatar slot="start">
+        <!-- Display different avatar images based on user's gender -->
+        <ng-container *ngIf="user.gender === 'male'">
+          <img src="../../../assets/images/male.png" alt="Male Avatar">
+        </ng-container>
+        <ng-container *ngIf="user.gender === 'female'">
+          <img src="../../../assets/images/male.png" alt="Female Avatar">
+        </ng-container>
+      </ion-avatar>
+      <ion-label>
+        <h2>{{ user.name }} {{ user.surname }}</h2>
+        <p class="user-info">Title: {{ user.title }}</p>
+        <p class="user-info">Date of Birth: {{ user.date_of_birth }}</p>
+        <p class="user-info">Mobile No: {{ user.mobile_no }}</p>
+        <!-- Add more user details here as needed -->
+      </ion-label>
+    </ion-item>
+  </ion-list>
+
+  <!-- LOADING SPINNER -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <ion-spinner></ion-spinner>
+  </div>
+</ion-content>
