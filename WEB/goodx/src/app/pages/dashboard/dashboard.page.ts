@@ -5,14 +5,14 @@ import { takeUntil, ReplaySubject } from 'rxjs';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Capacitor } from '@capacitor/core';
-import { LoginService } from 'src/app/services/login.service';
-import {  ToastmessageService } from 'src/app/services/toaster.service';
+import { LoginService } from '../../services/login.service';
+import {  ToastmessageService } from '../../services/toaster.service';
 import { CalBooking, StorageService, } from '../../services/storage.service';
 import { IonRouterOutlet, LoadingController } from '@ionic/angular';
 import { IonModal } from '@ionic/angular';
 import { format, parseISO } from 'date-fns';
-import { BookingsService } from 'src/app/services/bookings.service';
-import { PatientsService } from 'src/app/services/patients.service';
+import { BookingsService } from '../../services/bookings.service';
+import { PatientsService } from '../../services/patients.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -23,6 +23,7 @@ export class DashboardPage implements OnInit, OnDestroy {
   @ViewChild(IonModal) modal!: IonModal;
   @ViewChild(CalendarComponent) myCal!: CalendarComponent;
   presentingElement:any = null;
+  public bookingForm!: FormGroup;
   public calendar = {
     mode: 'month' as CalendarMode,
     currentDate: new Date()
@@ -60,21 +61,43 @@ export class DashboardPage implements OnInit, OnDestroy {
   isLoading: boolean = false;
   private destroy$: ReplaySubject<boolean> = new ReplaySubject(1);
 
-  constructor(private loginApi: LoginService, private toasterService: ToastmessageService,
+  constructor(private loginApi: LoginService, private toasterService: ToastmessageService, private formBuilder: FormBuilder,
     private storageS: StorageService, private router: Router, private ionRouterOutlet: IonRouterOutlet,
     private bookingService: BookingsService, private patientsApi: PatientsService, private loadingCtrl: LoadingController) {
       this.presentingElement = ionRouterOutlet.nativeEl;
     }
 
   async ngOnInit() {
-   // this.bookingSource = await this.storageS.getBookingData();
+    this.buildForm();
   }
 
-  ionViewDidEnter() {
-    this.getPatients();
+  async ionViewDidEnter() {
+    await this.getPatients();
     this.getBookings();
     this.getBookingStatuses();
     this.getBookingTypes();
+  }
+
+  buildForm() {
+    this.bookingForm = this.formBuilder.group({
+      entity_uid: [4, Validators.required],
+      diary_uid: [4, Validators.required],
+      booking_type_uid: [null, Validators.required],
+      booking_status_uid: [null, Validators.required],
+      start_time: [null, Validators.required],
+      duration: [null, Validators.required],
+      patient_uid: [null, Validators.required],
+      reason: [null, Validators.required],
+      cancelled: [false, Validators.required],
+      selectedPatient: [null, Validators.required],
+      selectedBookingType: [null, Validators.required],
+      selectedBookingStatus: [null, Validators.required],
+      allDay: [false, Validators.required],
+    });
+  }
+
+  get errorControl() {
+    return this.bookingForm.controls;
   }
 
   getPatients() {
@@ -278,6 +301,7 @@ export class DashboardPage implements OnInit, OnDestroy {
 
   openAddModal() {
     this.updateEvent = false;
+    this.bookingForm.patchValue({reason: '', allDay: false, selectedPatient:  null, selectedBookingStatus: null, selectedBookingType: null });
     this.modal.present();
   }
 
@@ -326,6 +350,8 @@ export class DashboardPage implements OnInit, OnDestroy {
     this.newBooking.reason = ev.reason;
     this.newBooking.allDay = ev.allDay;
 
+    this.bookingForm.patchValue({reason: title, allDay: ev.allDay, selectedPatient:  this.selectedPatient, selectedBookingStatus: this.selectedBookingStatus, selectedBookingType: this.selectedBookingType});
+
     let futureDate:any = new Date(this.newBooking.startTime);
     futureDate.setMinutes(futureDate.getMinutes() + foundObject.duration);
     this.formattedEnd = format(futureDate, 'HH:mm, MMM d, yyyy');
@@ -345,49 +371,75 @@ export class DashboardPage implements OnInit, OnDestroy {
     this.myCal.slidePrev();
   }
 
+  selectedPatientObject(ev: any) {
+    this.selectedPatient = ev.detail.value;
+    this.bookingForm.patchValue({selectedPatient:  ev.detail.value, patient_uid: ev.detail.value.uid});
+  }
+
+  selectedStatusObject(ev: any) {
+    this.selectedBookingStatus = ev.detail.value;
+    this.bookingForm.patchValue({selectedBookingStatus:  ev.detail.value, booking_status_uid: ev.detail.value.uid});
+  }
+
+  selectedTypeObject(ev: any) {
+    this.selectedBookingType = ev.detail.value;
+    this.bookingForm.patchValue({selectedBookingType:  ev.detail.value, booking_type_uid: ev.detail.value.uid});
+  }
+
+  calculateDuration(startDate:any, endDate:any) {
+    // Convert the dates to Date objects if they are not already
+    const start:any = new Date(startDate);
+    const end:any = new Date(endDate);
+    
+    // Calculate the difference in milliseconds
+    const differenceMs = end - start;
+
+    // Return an object with the duration components
+    const minutes = Math.floor(differenceMs / (1000 * 60));
+    return minutes;
+  }
+
   scheduleBooking() {
-    const toAdd: CalBooking = {
-      title: this.selectedPatient.name + this.newBooking.title ,
-      allDay: this.newBooking.allDay,
-      startTime: new Date(this.newBooking.startTime),
-      endTime: new Date(this.newBooking.endTime)
-    }
-    this.bookingSource.push(toAdd);
-    this.myCal.loadEvents();
-    // this.storageS.addBookingData(toAdd)
-
-    this.newBooking = {
-      entity_uid: 4,
-      diary_uid: 4,
-      booking_type_uid: this.selectedBookingType.uid,
-      booking_status_uid: this.selectedBookingStatus.uid,
-      start_time: new Date(this.newBooking.startTime),
-      duration: this.selectedDuration,
-      patient_uid: this.selectedPatient.uid,
-      reason: this.newBooking.title,
-      cancelled: false
-    }
-
-    console.log(this.newBooking);
-
     // SAVE BOOKING
+    let uniqueArray: CalBooking[] = [];
+    let patient: any = '';
+    const duration = this.calculateDuration(this.newBooking.startTime, this.newBooking.endTime);
+    this.bookingForm.patchValue({duration : duration, start_time: this.newBooking.startTime });
+    this.updateEvent = true;
+    if (this.bookingForm.valid) { // VALID FORM VALUES
+      this.bookingService.makeBookingWeb(this.newBooking).pipe(takeUntil(this.destroy$)).subscribe({
+        next: (response) => {
+          this.isLoading = false;
+          this.toasterService.displaySuccessToast('Successfull booked');
+          let startTime = new Date(response.data.start_time);
+          let futureDate:any = new Date(startTime);
+          futureDate.setMinutes(startTime.getMinutes() + response.data.duration);
+          futureDate = format(futureDate, "yyyy-MM-dd'T'HH:mm:ss");
 
-    // this.newBooking = {
-    //   title: '',
-    //   allDay: false,
-    //   startTime: null,
-    //   endTime: null,
-    //   entity_uid: 4,
-    //   diary_uid: 4,
-    //   booking_type_uid: null,
-    //   booking_status_uid: null,
-    //   start_time: null,
-    //   duration: null,
-    //   patient_uid: null,
-    //   reason: null,
-    //   cancelled: false
-    // }
-    this.modal.dismiss()
+          const toAdd: CalBooking = {
+            title: patient + ' - ' + response.data.reason,
+            allDay: false,
+            startTime: new Date(response.data.start_time),
+            endTime: new Date(futureDate),
+          }
+
+          uniqueArray.push(toAdd);
+          this.bookingSource.push(toAdd);
+          this.myCal.loadEvents();
+        },
+        error: (err: ErrorEvent) => {
+          this.isLoading = false;
+          this.toasterService.displayErrorToast(err.error.status);
+        },
+        complete: () => {
+          this.isLoading = false;
+          this.modal.dismiss()
+          return;
+        }
+      });
+    } else {
+      this.toasterService.displayErrorToast('Fill in all required fields');
+    }
   }
 
   logout() {

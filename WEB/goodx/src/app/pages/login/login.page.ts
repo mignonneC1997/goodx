@@ -4,8 +4,8 @@ import { Router } from '@angular/router';
 import { Capacitor } from '@capacitor/core';
 import { LoadingController } from '@ionic/angular';
 import { ReplaySubject, takeUntil } from 'rxjs';
-import { LoginService } from 'src/app/services/login.service';
-import {  ToastmessageService } from 'src/app/services/toaster.service';
+import { LoginService } from '../../services/login.service';
+import {  ToastmessageService } from '../../services/toaster.service';
 import { StorageService } from '../../services/storage.service';
 
 @Component({
@@ -36,6 +36,10 @@ export class LoginPage implements OnInit, OnDestroy {
     private storageS: StorageService, private loadingCtrl: LoadingController) {}
 
   ngOnInit() {
+    this.buildForm();
+  }
+
+  buildForm() {
     this.loginForm = this.formBuilder.group({
       username: ['', Validators.required],
       password: ['', Validators.required],

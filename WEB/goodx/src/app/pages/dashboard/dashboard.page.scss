@@ -41,3 +41,17 @@ margin-bottom: 20px;
     --color: var(--ion-color-primary)!important;
     transform:  scale(1.5);
 }
+
+.errorSpan {
+    color: red;
+    font-weight: 600;
+    text-shadow: 0px 1px rgba(34, 23, 23, 0.597);
+}
+
+ion-input.ng-invalid.ng-touched  {
+    border: solid 2px red;
+}
+
+ion-select.ng-invalid.ng-touched {
+    border: solid 2px red;
+}

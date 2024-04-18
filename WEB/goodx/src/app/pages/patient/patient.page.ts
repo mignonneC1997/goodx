@@ -4,9 +4,9 @@ import { Router } from '@angular/router';
 import { Capacitor } from '@capacitor/core';
 import { LoadingController } from '@ionic/angular';
 import { ReplaySubject, takeUntil } from 'rxjs';
-import { PatientsService } from 'src/app/services/patients.service';
-import { StorageService } from 'src/app/services/storage.service';
-import { ToastmessageService } from 'src/app/services/toaster.service';
+import { PatientsService } from '../../services/patients.service';
+import { StorageService } from '../../services/storage.service';
+import { ToastmessageService } from '../../services/toaster.service';
 
 interface User {
   entity_uid: number;
