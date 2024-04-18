@@ -79,6 +79,42 @@
           <ion-input type="text" [(ngModel)]="newBooking.title" placeholder="Reason"/>
         </div>
         <div class="group">
+          <!-- Dropdown menu for patient list -->
+          <ion-item>
+            <ion-label>Select Patient:</ion-label>
+            <ion-select interface="action-sheet" [(ngModel)]="selectedPatient">
+              <!-- Loop through patientList and display their titles -->
+               <ion-select-option *ngFor="let patient of patientList" [value]="patient">
+                {{ patient.name }} - {{ patient.surname}}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+        </div>
+        <div class="group">
+          <!-- Dropdown menu for bookingTypes -->
+          <ion-item>
+            <ion-label>Select booking type:</ion-label>
+            <ion-select interface="action-sheet" [(ngModel)]="selectedBookingType">
+              <!-- Loop through patientList and display their titles -->
+               <ion-select-option *ngFor="let type of bookingTypes" [value]="type">
+                {{ type.name }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+        </div>
+        <div class="group">
+          <!-- Dropdown menu for bookingTypes -->
+          <ion-item>
+            <ion-label>Select booking status:</ion-label>
+            <ion-select interface="action-sheet" [(ngModel)]="selectedBookingStatus">
+              <!-- Loop through patientList and display their titles -->
+               <ion-select-option *ngFor="let status of bookingStatuses" [value]="status">
+                {{ status.name }}
+              </ion-select-option>
+            </ion-select>
+          </ion-item>
+        </div>
+        <div class="group">
           <ion-item>
             <ion-label>
               All Day

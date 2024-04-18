@@ -113,4 +113,72 @@ export class BookingsService {
         }));
     });
   }
+
+  public bookingTypesWeb = (): Observable<any> => {
+    return this.http.get<any>(environment.urlWeb + 'booking_type?fields=["uid","entity_uid","diary_uid","name","booking_status_uid","disabled","uuid"]', { headers: this.httpHeaderService.getHTTPHeaders(), observe: 'response' }).pipe(
+    map((response: HttpResponse<any>) => {
+      return response.body;
+    }), catchError((error: HttpErrorResponse) => {
+      return throwError(() => error);
+    })
+    ); 
+}
+
+public bookingTypesNative = (): Observable<any> => {
+  const url = environment.urlNative + 'booking_type?fields=["uid","entity_uid","diary_uid","name","booking_status_uid","disabled","uuid"]';
+  const options: HttpOptions = {
+    headers: {
+      'Content-Type': 'application/json',
+      'Accept': '*/*',
+      'Access-Control-Allow-Origin': '*'
+    },
+    url,
+    method: 'GET'
+  }
+
+  return new Observable(observer => {
+    from(Http.get(options)
+      .then(response => {
+        observer.next(response); // Emit the response
+        observer.complete();    // Complete the Observable
+      })
+      .catch(error => {
+        observer.error(error);  // Emit the error
+      }));
+  });
+}
+
+public bookingStatusWeb = (): Observable<any> => {
+  return this.http.get<any>(environment.urlWeb + 'booking_status?fields=["uid","entity_uid","diary_uid","name","next_booking_status_uid","is_arrived","is_final", "disabled"]', { headers: this.httpHeaderService.getHTTPHeaders(), observe: 'response' }).pipe(
+  map((response: HttpResponse<any>) => {
+    return response.body;
+  }), catchError((error: HttpErrorResponse) => {
+    return throwError(() => error);
+  })
+  ); 
+}
+
+public bookingStatusNative = (): Observable<any> => {
+const url = environment.urlNative + 'booking_status?fields=["uid","entity_uid","diary_uid","name","next_booking_status_uid","is_arrived","is_final", "disabled"]';
+const options: HttpOptions = {
+  headers: {
+    'Content-Type': 'application/json',
+    'Accept': '*/*',
+    'Access-Control-Allow-Origin': '*'
+  },
+  url,
+  method: 'GET'
+}
+
+return new Observable(observer => {
+  from(Http.get(options)
+    .then(response => {
+      observer.next(response); // Emit the response
+      observer.complete();    // Complete the Observable
+    })
+    .catch(error => {
+      observer.error(error);  // Emit the error
+    }));
+});
+}
 }
