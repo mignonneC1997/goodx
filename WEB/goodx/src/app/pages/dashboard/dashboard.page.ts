@@ -1,5 +1,5 @@
 /* eslint-disable @angular-eslint/no-empty-lifecycle-method */
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { CalendarMode, CalendarComponent  } from 'ionic6-calendar';
 import { takeUntil, ReplaySubject } from 'rxjs';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -8,7 +8,7 @@ import { Capacitor } from '@capacitor/core';
 import { LoginService } from 'src/app/services/login.service';
 import {  ToastmessageService } from 'src/app/services/toaster.service';
 import { CalBooking, StorageService, } from '../../services/storage.service';
-import { IonRouterOutlet } from '@ionic/angular';
+import { IonRouterOutlet, LoadingController } from '@ionic/angular';
 import { IonModal } from '@ionic/angular';
 import { format, parseISO } from 'date-fns';
 import { BookingsService } from 'src/app/services/bookings.service';
@@ -19,7 +19,7 @@ import { PatientsService } from 'src/app/services/patients.service';
   templateUrl: './dashboard.page.html',
   styleUrls: ['./dashboard.page.scss'],
 })
-export class DashboardPage implements OnInit {
+export class DashboardPage implements OnInit, OnDestroy {
   @ViewChild(IonModal) modal!: IonModal;
   @ViewChild(CalendarComponent) myCal!: CalendarComponent;
   presentingElement:any = null;
@@ -57,11 +57,12 @@ export class DashboardPage implements OnInit {
   public selectedBookingStatus:any =[];
   public selectedPatient:any = null;
   public selectedDuration = null;
+  isLoading: boolean = false;
   private destroy$: ReplaySubject<boolean> = new ReplaySubject(1);
 
   constructor(private loginApi: LoginService, private toasterService: ToastmessageService,
     private storageS: StorageService, private router: Router, private ionRouterOutlet: IonRouterOutlet,
-    private bookingService: BookingsService, private patientsApi: PatientsService) {
+    private bookingService: BookingsService, private patientsApi: PatientsService, private loadingCtrl: LoadingController) {
       this.presentingElement = ionRouterOutlet.nativeEl;
     }
 
@@ -77,12 +78,15 @@ export class DashboardPage implements OnInit {
   }
 
   getPatients() {
+    this.isLoading = true;
     if (Capacitor.getPlatform() === 'web') {
       this.patientsApi.patientsWeb().pipe(takeUntil(this.destroy$)).subscribe({
         next: (response) => {
+          this.isLoading = false;
           this.patientList = response.data;
         },
         error: (err: ErrorEvent) => {
+          this.isLoading = false;
           this.toasterService.displayErrorToast(err.error.status);
         },
         complete: () => {
@@ -91,7 +95,8 @@ export class DashboardPage implements OnInit {
       });
     } else {
       this.patientsApi.patientsNative().pipe(takeUntil(this.destroy$)).subscribe({
-        next: (response) => {  
+        next: (response) => {
+          this.isLoading = false;
           if (response.data.status === 'OK') {
             this.patientList = response.data.data;
           } else {
@@ -99,6 +104,7 @@ export class DashboardPage implements OnInit {
           }
         },
         error: (err: ErrorEvent) => {
+          this.isLoading = false;
           this.toasterService.displayErrorToast(err.error.status);
         },
         complete: () => {
@@ -109,12 +115,14 @@ export class DashboardPage implements OnInit {
   }
 
   getBookings() {
+    this.isLoading = true;
     let uniqueArray: CalBooking[] = [];
     let patientObject: any =[];
     let patient: any = '';
       if (Capacitor.getPlatform() === 'web') {
         this.bookingService.bookingWeb().pipe(takeUntil(this.destroy$)).subscribe({
           next: (response) => {
+            this.isLoading = false;
             this.tempBookingSource = response.data;
             response.data.map((item: any, index: string | number) => {
               let startTime = new Date(response.data[index].start_time);
@@ -141,6 +149,7 @@ export class DashboardPage implements OnInit {
             );
           },
           error: (err: ErrorEvent) => {
+            this.isLoading = false;
             this.toasterService.displayErrorToast(err.error.status);
           },
           complete: () => {
@@ -149,7 +158,8 @@ export class DashboardPage implements OnInit {
         });
       } else {
         this.bookingService.bookingsNative().pipe(takeUntil(this.destroy$)).subscribe({
-          next: (response) => {  
+          next: (response) => {
+            this.isLoading = false;
             if (response.data.status === 'OK') {
               this.tempBookingSource = response.data.data;
               response.data.map((item: any, index: string | number) => {
@@ -180,6 +190,7 @@ export class DashboardPage implements OnInit {
             }
           },
           error: (err: ErrorEvent) => {
+            this.isLoading = false;
             this.toasterService.displayErrorToast(err.error.status);
           },
           complete: () => {
@@ -190,13 +201,16 @@ export class DashboardPage implements OnInit {
   }
 
   getBookingStatuses() {
+    this.isLoading = true;
     if (Capacitor.getPlatform() === 'web') {
       let uniqueArray: CalBooking[] = [];
       this.bookingService.bookingStatusWeb().pipe(takeUntil(this.destroy$)).subscribe({
         next: (response) => {
+          this.isLoading = false;
           this.bookingStatuses = response.data;
         },
         error: (err: ErrorEvent) => {
+          this.isLoading = false;
           this.toasterService.displayErrorToast(err.error.status);
         },
         complete: () => {
@@ -205,7 +219,8 @@ export class DashboardPage implements OnInit {
       });
     } else {
       this.bookingService.bookingStatusNative().pipe(takeUntil(this.destroy$)).subscribe({
-        next: (response) => {  
+        next: (response) => {
+          this.isLoading = false;
           if (response.data.status === 'OK') {
             this.bookingStatuses = response.data.data;
           } else {
@@ -213,6 +228,7 @@ export class DashboardPage implements OnInit {
           }
         },
         error: (err: ErrorEvent) => {
+          this.isLoading = false;
           this.toasterService.displayErrorToast(err.error.status);
         },
         complete: () => {
@@ -223,13 +239,16 @@ export class DashboardPage implements OnInit {
   }
 
   getBookingTypes() {
+    this.isLoading = true;
     if (Capacitor.getPlatform() === 'web') {
       let uniqueArray: CalBooking[] = [];
       this.bookingService.bookingTypesWeb().pipe(takeUntil(this.destroy$)).subscribe({
         next: (response) => {
+          this.isLoading = false;
           this.bookingTypes = response.data;        
         },
         error: (err: ErrorEvent) => {
+          this.isLoading = false;
           this.toasterService.displayErrorToast(err.error.status);
         },
         complete: () => {
@@ -238,7 +257,8 @@ export class DashboardPage implements OnInit {
       });
     } else {
       this.bookingService.bookingTypesNative().pipe(takeUntil(this.destroy$)).subscribe({
-        next: (response) => {  
+        next: (response) => {
+          this.isLoading = false;
           if (response.data.status === 'OK') {
             this.bookingTypes = response.data.data;  
           } else {
@@ -246,6 +266,7 @@ export class DashboardPage implements OnInit {
           }
         },
         error: (err: ErrorEvent) => {
+          this.isLoading = false;
           this.toasterService.displayErrorToast(err.error.status);
         },
         complete: () => {
@@ -377,6 +398,48 @@ export class DashboardPage implements OnInit {
 
   patients() {
     this.router.navigate(['/patient']);
+  }
+
+  ngOnDestroy() {
+    // Unsubscribe to prevent memory leaks
+    this.presentingElement = null;
+    this.calendar = {
+      mode: 'month' as CalendarMode,
+      currentDate: new Date()
+    }
+    this.viewTitle = '';
+    this.bookingSource = [];
+    this.tempBookingSource = []
+    this.newBooking = {
+      title: '',
+      allDay: false,
+      startTime: null,
+      endTime: null,
+      entity_uid: 4,
+      diary_uid: 4,
+      booking_type_uid: null,
+      booking_status_uid: null,
+      start_time: null,
+      duration: null,
+      patient_uid: null,
+      reason: null,
+      cancelled: false
+    }
+    this.updateEvent = false;
+    this.showStart = false;
+    this.showEnd = false;
+    this.formattedStart = '';
+    this.formattedEnd = '';
+    this.patientList = [];
+    this.bookingTypes = [];
+    this.bookingStatuses = [];
+    this.selectedBookingType = [];
+    this.selectedBookingStatus =[];
+    this.selectedPatient = null;
+    this.selectedDuration = null;
+    this.isLoading = false;
+    this.destroy$.next(true);
+    this.destroy$.complete();
   }
 
 }

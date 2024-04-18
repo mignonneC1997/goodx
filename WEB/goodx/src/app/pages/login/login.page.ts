@@ -1,7 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Capacitor } from '@capacitor/core';
+import { LoadingController } from '@ionic/angular';
 import { ReplaySubject, takeUntil } from 'rxjs';
 import { LoginService } from 'src/app/services/login.service';
 import {  ToastmessageService } from 'src/app/services/toaster.service';
@@ -12,7 +13,7 @@ import { StorageService } from '../../services/storage.service';
   templateUrl: './login.page.html',
   styleUrls: ['./login.page.scss'],
 })
-export class LoginPage implements OnInit {
+export class LoginPage implements OnInit, OnDestroy {
   public loginForm!: FormGroup;
   public loginData = {
     "model": {
@@ -28,10 +29,11 @@ export class LoginPage implements OnInit {
       ]
     ]
   }
+  isLoading: boolean = false;
   private destroy$: ReplaySubject<boolean> = new ReplaySubject(1);
 
   constructor(private formBuilder: FormBuilder, private router: Router, private loginApi: LoginService, private toasterService: ToastmessageService,
-    private storageS: StorageService) {}
+    private storageS: StorageService, private loadingCtrl: LoadingController) {}
 
   ngOnInit() {
     this.loginForm = this.formBuilder.group({
@@ -41,6 +43,7 @@ export class LoginPage implements OnInit {
   }
 
   login() {
+    this.isLoading = true;
     this.loginData = {
       "model": {
         "timeout": 259200
@@ -59,6 +62,7 @@ export class LoginPage implements OnInit {
       if (Capacitor.getPlatform() === 'web') {
         this.loginApi.loginWeb(this.loginData).pipe(takeUntil(this.destroy$)).subscribe({
           next: (response) => {
+            this.isLoading = false;
             console.log(response.data.uid);
             this.saveToken(response.data.uid);
             localStorage.setItem('userToken', response.data.uid);
@@ -66,15 +70,18 @@ export class LoginPage implements OnInit {
             this.router.navigate(['/dashboard']);
           },
           error: (err: ErrorEvent) => {
+            this.isLoading = false;
             this.toasterService.displayErrorToast(err.error.status);
           },
           complete: () => {
+            this.isLoading = false;
             return;
           }
         });
       } else {
         this.loginApi.loginNative(this.loginData).pipe(takeUntil(this.destroy$)).subscribe({
-          next: (response) => {  
+          next: (response) => { 
+            this.isLoading = false; 
             if (response.data.status === 'OK') {
               console.log(response.data.data.uid);
               this.saveToken(response.data.data.uid);
@@ -85,9 +92,11 @@ export class LoginPage implements OnInit {
             }
           },
           error: (err: ErrorEvent) => {
+            this.isLoading = false;
             this.toasterService.displayErrorToast(err.error.status);
           },
           complete: () => {
+            this.isLoading = false;
             return;
           }
         });
@@ -102,5 +111,26 @@ export class LoginPage implements OnInit {
         this.toasterService.displayErrorToast('Could not save token in storage');
        // this.logService.frontendLogging(4, `USER - ${this.useId} PLATFORM - ${Capacitor.getPlatform()} IN - saveUserData MESSAGE - ${JSON.stringify(err)} V-${this.appVersionn}`);
     });
+  }
+
+  ngOnDestroy() {
+    // Unsubscribe to prevent memory leaks
+    this.loginData = {
+      "model": {
+        "timeout": 259200
+      },
+      "auth": [
+        [
+          "password",
+          {
+            "username": '',
+            "password": ''
+          }
+        ]
+      ]
+    };
+    this.isLoading = false;
+    this.destroy$.next(true);
+    this.destroy$.complete();
   }
 }

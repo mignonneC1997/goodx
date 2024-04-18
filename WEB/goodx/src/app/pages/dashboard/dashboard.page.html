@@ -157,5 +157,10 @@
   <ng-template #weekviewTemplate let-displayEvent="displayEvent">
     <div class="calendar-event-inner week-event">{{displayEvent.event.title}}</div>
   </ng-template>
+
+  <!-- LOADING SPINNER -->
+  <div class="loading-overlay" *ngIf="isLoading">
+    <ion-spinner></ion-spinner>
+  </div>
   
 </ion-content>
