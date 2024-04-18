@@ -85,7 +85,8 @@
           </ion-item>
           <ion-datetime #start *ngIf="showStart"
           [value]="newBooking.startTime"
-          [presentation]="newBooking.allDay ? 'date' : 'time-date'"></ion-datetime>
+          [presentation]="newBooking.allDay ? 'date' : 'time-date'"
+          (ionChange)="startChanged(start.value)"></ion-datetime>
 
           <ion-item (click)="showEnd = !showEnd">
             <ion-label>Ends</ion-label>
@@ -93,7 +94,8 @@
           </ion-item>
           <ion-datetime #end *ngIf="showEnd" 
           [value]="newBooking.endTime"
-          [presentation]="newBooking.allDay ? 'date' : 'time-date'"></ion-datetime>
+          [presentation]="newBooking.allDay ? 'date' : 'time-date'"
+          (ionChange)="endChanged(end.value)"></ion-datetime>
         </div>
       </ion-content>
     </ng-template>

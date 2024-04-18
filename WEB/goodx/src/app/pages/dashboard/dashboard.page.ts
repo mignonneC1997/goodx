@@ -11,7 +11,7 @@ import { StorageService } from '../../services/storage.service';
 import { IonRouterOutlet } from '@ionic/angular';
 import { IonModal } from '@ionic/angular';
 import { OverlayEventDetail } from '@ionic/core/components';
-import { format } from 'date-fns';
+import { format, parseISO } from 'date-fns';
 
 @Component({
   selector: 'app-dashboard',
@@ -52,21 +52,26 @@ export class DashboardPage implements OnInit {
   }
 
   onTimeSelected(ev: {selectedTime: Date; events: any[]}){
-    const selected = new Date(ev.selectedTime); // calendar selected time 
     this.formattedStart = format(ev.selectedTime, 'HH:mm, MMM d, yyyy'); // format booking start time
+    this.newBooking.startTime = format(ev.selectedTime, "yyyy-MM-dd'T'HH:mm:ss"); // add start date to new booking
 
-    selected.setHours(selected.getHours() + 2); // GMT+2 timezone
-    this.newBooking.startTime = selected.toISOString();
-
-    selected.setHours(selected.getHours() + 1);
-    const endDate = selected.setHours(selected.getHours() - 2); // GMT-2 timezone for displaying booking end date
-
-    this.formattedEnd = format(endDate, 'HH:mm, MMM d, yyyy'); // format booking end time
-    this.newBooking.endTime = selected.toISOString();
+    const later = ev.selectedTime.setHours(ev.selectedTime.getHours() + 1); // add 1 hour for booking
+    this.formattedEnd = format(later, 'HH:mm, MMM d, yyyy'); // format booking end time
+    this.newBooking.endTime = format(later, "yyyy-MM-dd'T'HH:mm:ss");  // add end date to new booking
 
     if (this.calendar.mode === 'day' || this.calendar.mode === 'week') { //open booking modal
       this.modal.present();
     }
+  }
+
+  startChanged(value:any){
+    this.newBooking.startTime = value;
+    this.formattedStart = format(parseISO(value), 'HH:mm, MMM d, yyyy'); 
+  }
+
+  endChanged(value:any) {
+    this.newBooking.endTime = value;
+    this.formattedEnd = format(parseISO(value), 'HH:mm, MMM d, yyyy');
   }
 
   calendarNext(){
@@ -88,3 +93,4 @@ export class DashboardPage implements OnInit {
   }
 
 }
+
