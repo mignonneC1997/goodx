@@ -39,20 +39,26 @@
   </ion-row> 
 
   <calendar
+  [eventSource]="bookingSource"
   [calendarMode]="calendar.mode"
   (onTitleChanged)="viewTitle = $event"
   [startingDayWeek]="1"
+  [autoSelect]="false"
   [startHour]="7"
   [endHour]="20"
-  (onTimeSelected)="onTimeSelected($event)"> </calendar>
+  (onTimeSelected)="onTimeSelected($event)"
+  (onEventSelected)="onBookingSelected($event)"
+  [monthviewDisplayEventTemplate]="monthviewTemplate"
+  [weekviewAllDayEventTemplate]="weekviewTemplate"
+  > </calendar>
 
   <ion-fab horizontal="center" vertical="bottom" horizontal="end" slot="fixed" >
-    <ion-fab-button id="inputmodel">
+    <ion-fab-button (click)="openAddModal()">
       <ion-icon name="add"></ion-icon>
     </ion-fab-button>
   </ion-fab>
+
   <ion-modal #modal
-  trigger="inputmodel"
   [presentingElement]="presentingElement">
     <ng-template>
       <ion-header>
@@ -62,15 +68,15 @@
             </ion-button>
           </ion-buttons>
           <ion-buttons slot="end">
-            <ion-button (click)="modal.dismiss()" [disabled]="!newBooking.title">Add
-            </ion-button>
+            <ion-button *ngIf="!updateEvent" (click)="scheduleBooking()" [disabled]="!newBooking.title">Add</ion-button>
+              <ion-button *ngIf="updateEvent" (click)="updateBooking()" [disabled]="!newBooking.title">Update</ion-button>
           </ion-buttons>
           <ion-title class="ion-text-center">New Booking</ion-title>
         </ion-toolbar>
       </ion-header>
       <ion-content class="ion-padding modal">
         <div class="group">
-          <ion-input type="text" [(ngModel)]="newBooking.title" placeholder="Title"/>
+          <ion-input type="text" [(ngModel)]="newBooking.title" placeholder="Reason"/>
         </div>
         <div class="group">
           <ion-item>
@@ -99,6 +105,21 @@
         </div>
       </ion-content>
     </ng-template>
-    
   </ion-modal>
+
+  <ng-template #monthviewTemplate let-view="view" let-row="row" let-col="col">
+    <div class="booking-container">
+     {{view.dates[row*7+col].label}}
+     <div class="indicator-container">
+      <div class="booking-indicator" *ngFor="let e of view.dates[row*7+col].events">
+        *
+      </div>
+     </div>
+    </div>
+  </ng-template>
+
+  <ng-template #weekviewTemplate let-displayEvent="displayEvent">
+    <div class="calendar-event-inner week-event">{{displayEvent.event.title}}</div>
+  </ng-template>
+  
 </ion-content>

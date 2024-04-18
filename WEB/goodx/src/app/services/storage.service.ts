@@ -1,6 +1,16 @@
 import { Injectable } from '@angular/core';
 import { Storage } from '@ionic/storage-angular';
 import * as CryptoJS from 'crypto-js';
+import { BookingsService } from './bookings.service';
+
+const STORAGE_KEY = 'mybookings';
+
+export interface CalBooking {
+  title: string,
+  allDay: boolean,
+  startTime: Date,
+  endTime: Date
+}
 
 @Injectable({
   providedIn: 'root'
@@ -9,13 +19,13 @@ export class StorageService {
   public deviceStorage: Storage | null = null;
   public encrypted = '';
 
-  constructor(public storage: Storage, ) {
+  constructor(public storage: Storage, private bookingAPI: BookingsService) {
     this.initStorage();
   }
 
   async initStorage() {
-    const storage = await this.storage.create();
-    this.deviceStorage = storage;
+    await this.storage.create();
+   // this.deviceStorage = storage;
   }
 
   // set a key/value
@@ -72,6 +82,16 @@ export class StorageService {
       return data;
     } catch (err) {
     }
+  }
+
+  async getBookingData() {
+    return await this.storage.get(STORAGE_KEY) || [];
+  }
+
+  async addBookingData(item: CalBooking) {
+    const booking = await this.getBookingData();
+    booking.push(item);
+    return await this.storage.set(STORAGE_KEY, booking);
   }
 
 }

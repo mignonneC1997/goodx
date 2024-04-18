@@ -28,6 +28,17 @@
 @import 'swiper/scss';
 @import '@ionic/angular/css/ionic-swiper';
 
-.fabIcon {
-    color: white;
-  }
+.calendar-event {
+    width: 100% !important;
+}
+
+    .monthview-primary-with-event {
+    background-color: var(--ion-color-light) !important;
+    color:black !important;
+}
+
+
+.monthview-selected {
+    background-color: var(--ion-color-primary)!important;
+    color: #fff !important;
+}
