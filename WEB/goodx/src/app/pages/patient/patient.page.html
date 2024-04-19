@@ -20,6 +20,8 @@
   </ion-toolbar>
 </ion-header>
 <ion-content mode="ios">
+  
+  <!-- USER LIST -->
   <ion-card *ngFor="let key of users; let i = index" class="my-2" (click)="viewProfile(key)">
     <ion-grid>
       <ion-row class="usersList mx-0 my-0">
@@ -38,6 +40,7 @@
     </ion-grid>
   </ion-card>
 
+  <!-- PATIENT PROFILE -->
   <ion-modal #patientModal [presentingElement]="presentingElement">
     <ng-template>
       <ion-header>
@@ -49,7 +52,6 @@
           </ion-buttons>
         </ion-toolbar>
       </ion-header>
-      
       <ion-content>
         <div class="container py-2 px-2">
           <div>
@@ -157,6 +159,8 @@
       </ion-content>      
     </ng-template>
   </ion-modal>
+
+  <!-- LOADING SPINNER -->
   <div class="loading-overlay" *ngIf="isLoading">
     <ion-spinner></ion-spinner>
   </div>

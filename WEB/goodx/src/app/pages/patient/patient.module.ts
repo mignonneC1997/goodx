@@ -16,7 +16,7 @@ import { PatientPage } from './patient.page';
     PatientPageRoutingModule
   ],
   schemas: [
-    CUSTOM_ELEMENTS_SCHEMA // Add CUSTOM_ELEMENTS_SCHEMA here
+    CUSTOM_ELEMENTS_SCHEMA
   ],
   declarations: [PatientPage]
 })

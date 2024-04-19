@@ -30,19 +30,18 @@ interface User {
 })
 
 export class PatientPage implements OnInit, OnDestroy {
-  presentingElement:any = null;
+  @ViewChild('patientModal') patientModal!: IonModal;
+  public presentingElement:any = null;
   public isLoading: boolean = false;
-  public showViewButton = false;
   public users!: User[];
   public temparray: any;
   public searchstring: any;
   public seachbar = false;
   public selectedPatient:any;
-  @ViewChild('patientModal') patientModal!: IonModal;
   private destroy$: ReplaySubject<boolean> = new ReplaySubject(1);
 
-  constructor(private patientsApi: PatientsService, private toasterService: ToastmessageService, private el: ElementRef,
-    private storageS: StorageService, private router: Router, private loadingCtrl: LoadingController, private ionRouterOutlet: IonRouterOutlet) {
+  constructor(private patientsApi: PatientsService, private toasterService: ToastmessageService,
+    private storageS: StorageService, private router: Router, private ionRouterOutlet: IonRouterOutlet) {
       this.presentingElement = ionRouterOutlet.nativeEl;
     }
 
@@ -61,6 +60,7 @@ export class PatientPage implements OnInit, OnDestroy {
     this.users = [];
     this.isLoading = true;
     if (Capacitor.getPlatform() === 'web') {
+      // GET PATIENTS LIST - WEB VERSION
       this.patientsApi.patientsWeb().pipe(takeUntil(this.destroy$)).subscribe({
         next: (response) => {
           this.isLoading = false;
@@ -76,6 +76,7 @@ export class PatientPage implements OnInit, OnDestroy {
         }
       });
     } else {
+       // GET PATIENTS LIST - APP VERSION
       this.patientsApi.patientsNative().pipe(takeUntil(this.destroy$)).subscribe({
         next: (response) => {  
           this.isLoading = false;
@@ -98,12 +99,11 @@ export class PatientPage implements OnInit, OnDestroy {
   }
 
   public logout = () => {
-    this.storageS.clearData();
-    localStorage.clear();
+    localStorage.clear(); // CLEAR STORAGE DATA
     this.router.navigate(['/login']);
   }
 
-  public dashboard= () => {
+  public dashboard = () => {
     this.router.navigate(['/bookings']);
   }
 
@@ -113,12 +113,14 @@ export class PatientPage implements OnInit, OnDestroy {
   }
 
   public searchuser = (ev:any) => {
+    // SEARCH USER IN USERS LIST
     this.users = this.temparray;
     const user =  ev.target.value;
     if (user.trim() === '') {
       return;
     }
 
+    // ONLY SHOW MATCHING USERS IN LIST
     this.users = this.users.filter((v: { name: string; }) => {
       if ((v.name.toLowerCase().indexOf(user.toLowerCase())) > -1) {
         return true;
@@ -134,6 +136,7 @@ export class PatientPage implements OnInit, OnDestroy {
   public back = () => {
     this.searchstring = '';
     this.seachbar = false;
+    // SET USER LIST TO ORIGINAL LIST AFTER SEARCH
     this.users = this.temparray;
   }
 
