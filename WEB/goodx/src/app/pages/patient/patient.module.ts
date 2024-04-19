@@ -5,7 +5,6 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 
 import { PatientPageRoutingModule } from './patient-routing.module';
-
 import { PatientPage } from './patient.page';
 
 @NgModule({

@@ -1,12 +1,12 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Capacitor } from '@capacitor/core';
-import { LoadingController } from '@ionic/angular';
+
+import { Capacitor } from '@capacitor/core';;
 import { ReplaySubject, takeUntil } from 'rxjs';
+
 import { LoginService } from '../../services/login.service';
 import {  ToastmessageService } from '../../services/toaster.service';
-import { StorageService } from '../../services/storage.service';
 
 @Component({
   selector: 'app-login',
@@ -29,24 +29,24 @@ export class LoginPage implements OnInit, OnDestroy {
       ]
     ]
   }
-  isLoading: boolean = false;
+  public isLoading: boolean = false;
   private destroy$: ReplaySubject<boolean> = new ReplaySubject(1);
 
-  constructor(private formBuilder: FormBuilder, private router: Router, private loginApi: LoginService, private toasterService: ToastmessageService,
-    private storageS: StorageService, private loadingCtrl: LoadingController) {}
+  constructor(private formBuilder: FormBuilder, private router: Router, private loginApi: LoginService, private toasterService: ToastmessageService) {}
 
   ngOnInit() {
     this.buildForm();
   }
 
-  buildForm() {
+  public buildForm = () => {
+    // BUILD REACTIVE FORM - VALIDATION
     this.loginForm = this.formBuilder.group({
       username: ['', Validators.required],
       password: ['', Validators.required],
     });
   }
 
-  login() {
+  public login = () => {
     this.isLoading = true;
     this.loginData = {
       "model": {
@@ -64,10 +64,11 @@ export class LoginPage implements OnInit, OnDestroy {
     }
     if (this.loginForm.valid) {
       if (Capacitor.getPlatform() === 'web') {
+        // LOGIN - WEB VERSION
         this.loginApi.loginWeb(this.loginData).pipe(takeUntil(this.destroy$)).subscribe({
           next: (response) => {
             this.isLoading = false;
-            this.saveToken(response.data.uid);
+            // SAVE UID TO LOCALSTORAGE
             localStorage.setItem('userToken', response.data.uid);
             this.toasterService.displaySuccessToast('successfully logged in');
             this.router.navigate(['/bookings']);
@@ -77,16 +78,17 @@ export class LoginPage implements OnInit, OnDestroy {
             this.toasterService.displayErrorToast(err.error.status);
           },
           complete: () => {
-            this.isLoading = false;
             return;
           }
         });
       } else {
+        // LOGIN - APP VERSION
         this.loginApi.loginNative(this.loginData).pipe(takeUntil(this.destroy$)).subscribe({
           next: (response) => { 
             this.isLoading = false; 
             if (response.data.status === 'OK') {
-              this.saveToken(response.data.data.uid);
+               // SAVE UID TO LOCALSTORAGE
+              localStorage.setItem('userToken', response.data.data.uid);
               this.toasterService.displaySuccessToast('successfully logged in');
               this.router.navigate(['/bookings']);
             } else {
@@ -98,21 +100,11 @@ export class LoginPage implements OnInit, OnDestroy {
             this.toasterService.displayErrorToast(err.error.status);
           },
           complete: () => {
-            this.isLoading = false;
             return;
           }
         });
       }
     }
-  }
-
-  public saveToken = (token: any) => {
-    this.storageS.setToken('userToken', token).then(result => {
-      return result;
-      }).catch(err => {
-        this.toasterService.displayErrorToast('Could not save token in storage');
-       // this.logService.frontendLogging(4, `USER - ${this.useId} PLATFORM - ${Capacitor.getPlatform()} IN - saveUserData MESSAGE - ${JSON.stringify(err)} V-${this.appVersionn}`);
-    });
   }
 
   ngOnDestroy() {

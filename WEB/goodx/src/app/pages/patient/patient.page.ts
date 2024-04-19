@@ -1,9 +1,11 @@
 /* eslint-disable @angular-eslint/no-empty-lifecycle-method */
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
+
 import { Capacitor } from '@capacitor/core';
-import { IonModal, IonRouterOutlet, LoadingController } from '@ionic/angular';
+import { IonModal, IonRouterOutlet } from '@ionic/angular';
 import { ReplaySubject, takeUntil } from 'rxjs';
+
 import { PatientsService } from '../../services/patients.service';
 import { StorageService } from '../../services/storage.service';
 import { ToastmessageService } from '../../services/toaster.service';
