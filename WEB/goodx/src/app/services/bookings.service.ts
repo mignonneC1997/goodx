@@ -46,18 +46,44 @@ export class BookingsService {
     });
   }
 
-  public updateBookingWeb = (): Observable<any> => {
-      return this.http.get<any>(environment.urlWeb + 'patient?fields=["entity_uid","id","debtor_uid","name","surname","initials","title","date_of_birth","mobile_no","gender","benefit_check"]', { headers: this.httpHeaderService.getHTTPHeaders(), observe: 'response' }).pipe(
+  public updateBookingWeb = (data:any): Observable<any> => {
+    const uid = data.uid;
+    const putData = {
+      model: {
+        uid: data.uid,
+        start_time: data.start_time,
+        duration: data.duration,
+        patient_uid: data.patient_uid,
+        reason: data.reason,
+        cancelled: false,
+        booking_status_uid: data.booking_status_uid,
+        booking_type_uid: data.booking_type_uid,
+      }
+    }
+    return this.http.put<any>(environment.urlWeb + `booking/${uid}`, putData, { headers: this.httpHeaderService.getHTTPHeaders(), observe: 'response' }).pipe(
       map((response: HttpResponse<any>) => {
         return response.body;
       }), catchError((error: HttpErrorResponse) => {
         return throwError(() => error);
       })
-      ); 
+    ); 
   }
 
-  public updateBookingNative = (): Observable<any> => {
-    const url = environment.urlNative + 'patient?fields=["entity_uid","id","debtor_uid","name","surname","initials","title","date_of_birth","mobile_no","gender","benefit_check"]';
+  public updateBookingNative = (data:any): Observable<any> => {
+    const uid = data.uid;
+    const putData = {
+      model: {
+        uid: data.uid,
+        start_time: data.start_time,
+        duration: data.duration,
+        patient_uid: data.patient_uid,
+        reason: data.reason,
+        cancelled: false,
+        booking_status_uid: data.booking_status_uid,
+        booking_type_uid: data.booking_type_uid,
+      }
+    }
+    const url = environment.urlNative + `booking/${uid}`;
     const options: HttpOptions = {
       headers: {
         'Content-Type': 'application/json',
@@ -65,11 +91,12 @@ export class BookingsService {
         'Access-Control-Allow-Origin': '*'
       },
       url,
-      method: 'GET'
+      method: 'PUT',
+      data: putData
     }
 
     return new Observable(observer => {
-      from(Http.get(options)
+      from(Http.put(options)
         .then(response => {
           observer.next(response); // Emit the response
           observer.complete();    // Complete the Observable

@@ -158,6 +158,7 @@
               <ion-text slot="end">{{formattedStart}}</ion-text>
             </ion-item>
             <ion-datetime #start *ngIf="showStart"
+            formControlName="start_time"
             [value]="newBooking.startTime"
             [presentation]="newBooking.allDay ? 'date' : 'time-date'"
             (ionChange)="startChanged(start.value)"></ion-datetime>

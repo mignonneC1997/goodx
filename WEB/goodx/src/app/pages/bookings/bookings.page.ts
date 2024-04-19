@@ -43,7 +43,8 @@ export class BookingsPage implements OnInit, OnDestroy {
     duration: null,
     patient_uid: null,
     reason: null,
-    cancelled: false
+    cancelled: false,
+    uid: null
   }
   public updateEvent = false;
   public showStart = false;
@@ -176,7 +177,6 @@ export class BookingsPage implements OnInit, OnDestroy {
   }
 
   async openUserModal() {
-    console.log('test');
     await this.modal.dismiss();
     this.patientModal.present();
   }
@@ -244,6 +244,15 @@ export class BookingsPage implements OnInit, OnDestroy {
                 allDay: false,
                 startTime: new Date(response.data[index].start_time),
                 endTime: new Date(futureDate),
+                uid: response.data[index].uid,
+                reason: response.data[index].reason,
+                entity_uid: response.data[index].entity_uid, 
+                start_time: response.data[index].start_time,
+                patient_uid: response.data[index].patient_uid,
+                booking_status_uid: response.data[index].booking_status_uid,
+                booking_type_uid: response.data[index].booking_type_uid,
+                diary_uid: response.data[index].diary_uid,
+                duration: response.data[index].duration
               }
 
               uniqueArray.push(toAdd);
@@ -265,7 +274,6 @@ export class BookingsPage implements OnInit, OnDestroy {
       } else {
         this.bookingService.bookingsNative().pipe(takeUntil(this.destroy$)).subscribe({
           next: (response) => {
-            console.log(response.data.data);
             this.isLoading = false;
             if (response.data.status === 'OK') {
               this.tempBookingSource = response.data.data;
@@ -283,6 +291,15 @@ export class BookingsPage implements OnInit, OnDestroy {
                   allDay: false,
                   startTime: new Date(response.data.data[index].start_time),
                   endTime: new Date(futureDate),
+                  uid: response.data.data[index].uid,
+                  reason: response.data.data[index].reason,
+                  entity_uid: response.data.data[index].entity_uid, 
+                  start_time: response.data.data[index].start_time,
+                  patient_uid: response.data.data[index].patient_uid,
+                  booking_status_uid: response.data.data[index].booking_status_uid,
+                  booking_type_uid: response.data.data[index].booking_type_uid,
+                  diary_uid: response.data.data[index].diary_uid,
+                  duration: response.data.data[index].duration
                 }
   
                 uniqueArray.push(toAdd);
@@ -327,15 +344,12 @@ export class BookingsPage implements OnInit, OnDestroy {
   }
 
   onBookingSelected(ev:any) {
-    console.log(ev);
     this.updateEvent = true;
     const hyphenIndex = ev.title.indexOf(' - ');
     const title = hyphenIndex !== -1 ? ev.title.substring(hyphenIndex + 3) : ev.title
 
     const foundObject = this.tempBookingSource.find((obj: { reason: number; }) => obj.reason === title);
-    console.log(foundObject.duration);
 
-    const foundObject2 = this.tempBookingSource.find((obj: { reason: number; }) => obj.reason === title);
     this.selectedDuration = foundObject.duration;
 
     this.selectedPatient = this.patientList.find((obj: { uid: number; }) => obj.uid === foundObject.patient_uid);
@@ -351,6 +365,7 @@ export class BookingsPage implements OnInit, OnDestroy {
     ev.viewTitle = title;
     this.newBooking.reason = ev.reason;
     this.newBooking.allDay = ev.allDay;
+    this.newBooking.uid = ev.uid;
 
     this.bookingForm.patchValue({reason: title, allDay: ev.allDay, selectedPatient:  this.selectedPatient, selectedBookingStatus: this.selectedBookingStatus, selectedBookingType: this.selectedBookingType, duration: this.selectedDuration});
 
@@ -362,7 +377,54 @@ export class BookingsPage implements OnInit, OnDestroy {
   }
 
   updateBooking() {
-   // console.log(this.newBooking);
+    const duration = this.calculateDuration(this.newBooking.startTime, this.newBooking.endTime);
+    this.bookingForm.patchValue({ 'patient_uid': this.selectedPatient.uid , 'booking_status_uid': this.selectedBookingStatus.uid, 'booking_type_uid': this.selectedBookingType.uid, 'start_time': new Date(this.newBooking.startTime), 'duration': duration })
+    this.newBooking.duration = duration;
+    const updateData = {
+      uid: this.newBooking.uid,
+      start_time: this.newBooking.startTime,
+      duration: duration,
+      patient_uid: this.bookingForm.get('patient_uid')?.value,
+      reason: this.bookingForm.get('reason')?.value,
+      booking_status_uid: this.bookingForm.get('booking_status_uid')?.value,
+      booking_type_uid: this.bookingForm.get('booking_type_uid')?.value,
+      cancelled: false
+    }
+    if (Capacitor.getPlatform() === 'web') {
+      this.bookingService.updateBookingWeb(updateData).pipe(takeUntil(this.destroy$)).subscribe({
+        next: (response) => {
+          this.myCal.loadEvents();
+          this.getBookings();
+          this.toasterService.displaySuccessToast('successfully updated booking');
+        },
+        error: (err: ErrorEvent) => {
+          this.isLoading = false;
+          this.toasterService.displayErrorToast(err.error.status);
+        },
+        complete: () => {
+          this.isLoading = false;
+          this.modal.dismiss()
+          return;
+      }
+      });
+    } else {
+      this.bookingService.updateBookingNative(updateData).pipe(takeUntil(this.destroy$)).subscribe({
+        next: (response) => {
+          this.toasterService.displaySuccessToast('successfully updated booking');
+          this.myCal.loadEvents();
+          this.getBookings();
+        },
+        error: (err: ErrorEvent) => {
+          this.isLoading = false;
+          this.toasterService.displayErrorToast(err.error.status);
+        },
+        complete: () => {
+          this.isLoading = false;
+          this.modal.dismiss()
+          return;
+        }
+      });
+    }
   }
 
   calendarNext(){
@@ -402,127 +464,152 @@ export class BookingsPage implements OnInit, OnDestroy {
   }
 
   scheduleBooking() {
-    // SAVE BOOKING
-    let uniqueArray: CalBooking[] = [];
-    let patient: any = '';
-  //  console.log(this.bookingForm.value);
-    const duration = this.calculateDuration(this.newBooking.startTime, this.newBooking.endTime);
-   // console.log(duration);
-    this.bookingForm.patchValue({duration : duration, start_time: this.newBooking.startTime });
-    this.updateEvent = true;
-    this.newBooking.start_time = new Date(this.newBooking.startTime);
-    this.newBooking.duration = duration;
-    this.newBooking.booking_status_uid = this.bookingForm.get('booking_status_uid')?.value;
-    this.newBooking.booking_type_uid = this.bookingForm.get('booking_type_uid')?.value;
-    this.newBooking.patient_uid = this.bookingForm.get('patient_uid')?.value;
-    this.newBooking.reason = this.bookingForm.get('reason')?.value;
-    delete this.newBooking['startTime'];
-    delete this.newBooking['endTime'];
-    delete this.newBooking['allDay'];
-    delete this.newBooking['title'];
-    console.log(this.newBooking);
-    if (this.bookingForm.valid) { // VALID FORM VALUES
-      if (Capacitor.getPlatform() === 'web') {
-        this.bookingService.makeBookingWeb(this.newBooking).pipe(takeUntil(this.destroy$)).subscribe({
-          next: (response) => {
-            this.isLoading = false;
-            this.toasterService.displaySuccessToast('Successfull booked');
-            let startTime = new Date(response.data.start_time);
-            let futureDate:any = new Date(startTime);
-            futureDate.setMinutes(startTime.getMinutes() + response.data.duration);
-            futureDate = format(futureDate, "yyyy-MM-dd'T'HH:mm:ss");
-  
-            this.newBooking = {
-              title: '',
-              allDay: false,
-              startTime: null,
-              endTime: null,
-              entity_uid: 4,
-              diary_uid: 4,
-              booking_type_uid: null,
-              booking_status_uid: null,
-              start_time: null,
-              duration: null,
-              patient_uid: null,
-              reason: null,
-              cancelled: false
-            }
-  
-            const toAdd: CalBooking = {
-              title: patient + ' - ' + response.data.reason,
-              allDay: false,
-              startTime: new Date(response.data.start_time),
-              endTime: new Date(futureDate),
-            }
-  
-            uniqueArray.push(toAdd);
-            this.bookingSource.push(toAdd);
-            this.myCal.loadEvents();
-            this.getBookings();
-          },
-          error: (err: ErrorEvent) => {
-            this.isLoading = false;
-            this.toasterService.displayErrorToast(err.error.status);
-          },
-          complete: () => {
-            this.isLoading = false;
-            this.modal.dismiss()
-            return;
-          }
-        });
+    this.toasterService.confirmBookingPrompt('Confirm booking').then((res) => {
+      if (res === false) {
+        return;
       } else {
-        this.bookingService.makeBookingNative(this.newBooking).pipe(takeUntil(this.destroy$)).subscribe({
-          next: (response) => {
-            this.isLoading = false;
-            this.toasterService.displaySuccessToast('Successfull booked');
-            let startTime = new Date(response.data.data.start_time);
-            let futureDate:any = new Date(startTime);
-            futureDate.setMinutes(startTime.getMinutes() + response.data.data.duration);
-            futureDate = format(futureDate, "yyyy-MM-dd'T'HH:mm:ss");
-  
-            this.newBooking = {
-              title: '',
-              allDay: false,
-              startTime: null,
-              endTime: null,
-              entity_uid: 4,
-              diary_uid: 4,
-              booking_type_uid: null,
-              booking_status_uid: null,
-              start_time: null,
-              duration: null,
-              patient_uid: null,
-              reason: null,
-              cancelled: false
-            }
-  
-            const toAdd: CalBooking = {
-              title: patient + ' - ' + response.data.data.reason,
-              allDay: false,
-              startTime: new Date(response.data.data.start_time),
-              endTime: new Date(futureDate),
-            }
-  
-            uniqueArray.push(toAdd);
-            this.bookingSource.push(toAdd);
-            this.myCal.loadEvents();
-            this.getBookings();
-          },
-          error: (err: ErrorEvent) => {
-            this.isLoading = false;
-            this.toasterService.displayErrorToast(err.error.status);
-          },
-          complete: () => {
-            this.isLoading = false;
-            this.modal.dismiss()
-            return;
+        // SAVE BOOKING
+        let uniqueArray: CalBooking[] = [];
+        let patient: any = '';
+        const duration = this.calculateDuration(this.newBooking.startTime, this.newBooking.endTime);
+        this.bookingForm.patchValue({duration : duration, start_time: this.newBooking.startTime });
+        this.updateEvent = true;
+        this.newBooking.start_time = new Date(this.newBooking.startTime);
+        this.newBooking.duration = duration;
+        this.newBooking.booking_status_uid = this.bookingForm.get('booking_status_uid')?.value;
+        this.newBooking.booking_type_uid = this.bookingForm.get('booking_type_uid')?.value;
+        this.newBooking.patient_uid = this.bookingForm.get('patient_uid')?.value;
+        this.newBooking.reason = this.bookingForm.get('reason')?.value;
+        delete this.newBooking['startTime'];
+        delete this.newBooking['endTime'];
+        delete this.newBooking['allDay'];
+        delete this.newBooking['title'];
+        if (this.bookingForm.valid) { // VALID FORM VALUES
+          if (Capacitor.getPlatform() === 'web') {
+            this.bookingService.makeBookingWeb(this.newBooking).pipe(takeUntil(this.destroy$)).subscribe({
+              next: (response) => {
+                this.isLoading = false;
+                this.toasterService.displaySuccessToast('Successfull booked');
+                let startTime = new Date(response.data.start_time);
+                let futureDate:any = new Date(startTime);
+                futureDate.setMinutes(startTime.getMinutes() + response.data.duration);
+                futureDate = format(futureDate, "yyyy-MM-dd'T'HH:mm:ss");
+      
+                this.newBooking = {
+                  title: '',
+                  allDay: false,
+                  startTime: null,
+                  endTime: null,
+                  entity_uid: 4,
+                  diary_uid: 4,
+                  booking_type_uid: null,
+                  booking_status_uid: null,
+                  start_time: null,
+                  duration: null,
+                  patient_uid: null,
+                  reason: null,
+                  cancelled: false
+                }
+      
+                const toAdd: CalBooking = {
+                  title: patient + ' - ' + response.data.reason,
+                  allDay: false,
+                  startTime: new Date(response.data.start_time),
+                  endTime: new Date(futureDate),
+                  uid: response.data.uid,
+                  reason: response.data.reason,
+                  entity_uid: response.data.entity_uid, 
+                  start_time: response.data.start_time,
+                  patient_uid: response.data.patient_uid,
+                  booking_status_uid: response.data.booking_status_uid,
+                  booking_type_uid: response.data.booking_type_uid,
+                  diary_uid: response.data.diary_uid,
+                  duration: response.data.duration
+                }
+      
+                uniqueArray.push(toAdd);
+                this.bookingSource.push(toAdd);
+                this.myCal.loadEvents();
+                this.getBookings();
+              },
+              error: (err: ErrorEvent) => {
+                this.isLoading = false;
+                this.toasterService.displayErrorToast(err.error.status);
+              },
+              complete: () => {
+                this.isLoading = false;
+                this.modal.dismiss()
+                return;
+              }
+            });
+          } else {
+            this.bookingService.makeBookingNative(this.newBooking).pipe(takeUntil(this.destroy$)).subscribe({
+              next: (response) => {
+                this.isLoading = false;
+                this.toasterService.displaySuccessToast('Successfull booked');
+                let startTime = new Date(response.data.data.start_time);
+                let futureDate:any = new Date(startTime);
+                futureDate.setMinutes(startTime.getMinutes() + response.data.data.duration);
+                futureDate = format(futureDate, "yyyy-MM-dd'T'HH:mm:ss");
+      
+                this.newBooking = {
+                  title: '',
+                  allDay: false,
+                  startTime: null,
+                  endTime: null,
+                  entity_uid: 4,
+                  diary_uid: 4,
+                  booking_type_uid: null,
+                  booking_status_uid: null,
+                  start_time: null,
+                  duration: null,
+                  patient_uid: null,
+                  reason: null,
+                  cancelled: false,
+                  uid: null
+                }
+      
+                const toAdd: CalBooking = {
+                  title: patient + ' - ' + response.data.data.reason,
+                  allDay: false,
+                  startTime: new Date(response.data.data.start_time),
+                  endTime: new Date(futureDate),
+                  uid: response.data.data.uid,
+                  reason: response.data.data.reason,
+                  entity_uid: response.data.data.entity_uid, 
+                  start_time: response.data.data.start_time,
+                  patient_uid: response.data.data.patient_uid,
+                  booking_status_uid: response.data.data.booking_status_uid,
+                  booking_type_uid: response.data.data.booking_type_uid,
+                  diary_uid: response.data.data.diary_uid,
+                  duration: response.data.data.duration
+                }
+      
+                uniqueArray.push(toAdd);
+                this.bookingSource.push(toAdd);
+                this.myCal.loadEvents();
+                this.getBookings();
+              },
+              error: (err: ErrorEvent) => {
+                this.isLoading = false;
+                this.toasterService.displayErrorToast(err.error.status);
+              },
+              complete: () => {
+                this.isLoading = false;
+                this.modal.dismiss()
+                return;
+              }
+            });
           }
-        });
-      }
 
-    } else {
-      this.toasterService.displayErrorToast('Fill in all required fields');
-    }
+        } else {
+          this.toasterService.displayErrorToast('Fill in all required fields');
+        }
+      }
+    }).catch(err => {
+      this.toasterService.displayErrorToast('Could not open booking prompt');
+     // this.logService.frontendLogging(4, `USER - ${this.userID} PLATFORM - ${Capacitor.getPlatform()} IN - openCameraTips MESSAGE - ${err} V-${this.appVersion}`);
+    });
   }
 
   logout() {
@@ -558,7 +645,8 @@ export class BookingsPage implements OnInit, OnDestroy {
       duration: null,
       patient_uid: null,
       reason: null,
-      cancelled: false
+      cancelled: false,
+      uid: null,
     }
     this.updateEvent = false;
     this.showStart = false;

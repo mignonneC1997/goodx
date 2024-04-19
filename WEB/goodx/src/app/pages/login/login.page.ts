@@ -67,7 +67,6 @@ export class LoginPage implements OnInit, OnDestroy {
         this.loginApi.loginWeb(this.loginData).pipe(takeUntil(this.destroy$)).subscribe({
           next: (response) => {
             this.isLoading = false;
-            console.log(response.data.uid);
             this.saveToken(response.data.uid);
             localStorage.setItem('userToken', response.data.uid);
             this.toasterService.displaySuccessToast('successfully logged in');
@@ -87,7 +86,6 @@ export class LoginPage implements OnInit, OnDestroy {
           next: (response) => { 
             this.isLoading = false; 
             if (response.data.status === 'OK') {
-              console.log(response.data.data.uid);
               this.saveToken(response.data.data.uid);
               this.toasterService.displaySuccessToast('successfully logged in');
               this.router.navigate(['/bookings']);

@@ -80,7 +80,6 @@ export class PatientPage implements OnInit, OnDestroy {
         next: (response) => {  
           this.isLoading = false;
           if (response.data.status === 'OK') {
-            console.log(response.data.data);
             this.users = response.data.data;
             this.temparray = response.data.data;
           } else {

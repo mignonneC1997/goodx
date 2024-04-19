@@ -51,4 +51,35 @@ export class ToastmessageService {
     });
     toast.present();
   }
+
+  async confirmBookingPrompt(msg:any) {
+    let response = false;
+    const alert = await this.alertController.create({
+    header: 'Booking',
+      message: msg,
+      backdropDismiss: false,
+      cssClass: 'bookingPrompt',
+      buttons: [
+        {
+          text: 'Continue',
+          handler: () => {
+            response = true;
+            alert.dismiss(true);
+          }
+        },
+        {
+          text: 'Close',
+          handler: () => {
+            response = false;
+            alert.dismiss(true);
+          }
+        }
+      ],
+    });
+    await alert.present();
+    await alert.onDidDismiss().then((data) => {
+      data.data = response;
+    });
+    return response;
+  }
 }
