@@ -46,6 +46,8 @@ export class BookingsPage implements OnInit, OnDestroy {
     cancelled: false,
     uid: null
   }
+  public showStart = false;
+  public showEnd = false;
   public formattedStart = '';
   public formattedEnd = '';
   public patientList:any = [];
@@ -163,8 +165,10 @@ export class BookingsPage implements OnInit, OnDestroy {
     }
   }
 
-  public openAddModal = () => {
+  public openAddModal = async () => {
     this.bookingForm.patchValue({reason: '', allDay: false, selectedPatient:  null, selectedBookingStatus: null, selectedBookingType: null });
+    await this.patientModal.dismiss();
+    await this.modalEdit.dismiss();
     this.modalAdd.present();
   }
 
@@ -330,7 +334,11 @@ export class BookingsPage implements OnInit, OnDestroy {
     this.newBooking.endTime = format(later, "yyyy-MM-dd'T'HH:mm:ss");  // add end date to new booking
 
     if (this.calendar.mode === 'day' || this.calendar.mode === 'week') { //open booking modal
-      this.modalAdd.present();
+      if (this.selectedPatient !== null) {
+        this.modalEdit.present();
+      } else {
+        this.modalAdd.present();
+      }
     }
   }
 
@@ -371,6 +379,8 @@ export class BookingsPage implements OnInit, OnDestroy {
     futureDate.setMinutes(futureDate.getMinutes() + bookingObject.duration);
     this.formattedEnd = format(futureDate, 'HH:mm, MMM d, yyyy'); // SET ENDDATE OF BOOKING BASED ON DURATION
     this.newBooking.endTime = format(futureDate, "yyyy-MM-dd'T'HH:mm:ss");
+    this.modalAdd.dismiss();
+    this.patientModal.dismiss();
     this.modalEdit.present();
   }
 
@@ -784,6 +794,8 @@ export class BookingsPage implements OnInit, OnDestroy {
       cancelled: false,
       uid: null,
     }
+    this.showStart = false;
+    this.showEnd = false;
     this.formattedStart = '';
     this.formattedEnd = '';
     this.patientList = [];

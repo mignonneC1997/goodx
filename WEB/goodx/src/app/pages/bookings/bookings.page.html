@@ -51,7 +51,6 @@
   (onTimeSelected)="onTimeSelected($event)"
   (onEventSelected)="onBookingSelected($event)"
   [monthviewDisplayEventTemplate]="monthviewTemplate"
-  [weekviewAllDayEventTemplate]="weekviewTemplate"
   ></calendar>
 
   <!-- BOOKING FORM -->
@@ -63,13 +62,13 @@
     </ion-fab>
 
     <!-- ADD BOOKINGS -->
-    <ion-modal #modalAdd
+    <ion-modal #modalAdd [presentingElement]="presentingElement" id="modalAdd"
     [presentingElement]="presentingElement">
       <ng-template>
         <ion-header>
           <ion-toolbar>
             <ion-buttons slot="start">
-              <ion-button (click)="modalAdd.dismiss()" >Cancel
+              <ion-button (click)="modalAdd.dismiss()" color="danger">Cancel
               </ion-button>
             </ion-buttons>
             <ion-buttons slot="end">
@@ -176,19 +175,19 @@
     </ion-modal>
 
     <!-- EDIT/DELETE BOOKINGS -->
-    <ion-modal #modalEdit
+    <ion-modal #modalEdit [presentingElement]="presentingElement" id="modalEdit"
     [presentingElement]="presentingElement">
       <ng-template>
         <ion-header>
           <ion-toolbar>
             <ion-buttons slot="start">
-              <ion-button (click)="modalEdit.dismiss()" >Cancel
+              <ion-button (click)="modalEdit.dismiss()" color="danger">Cancel
               </ion-button>
             </ion-buttons>
             <ion-buttons slot="end">
-                <ion-button (click)="updateBooking()" color="danger">Update</ion-button>
+                <ion-button (click)="updateBooking()" color="primary">Update</ion-button>
             </ion-buttons>
-            <ion-title class="ion-text-center" *ngIf="selectedPatient" color="primary">Appointment</ion-title>
+            <ion-title class="ion-text-center" *ngIf="selectedPatient">Appointment</ion-title>
           </ion-toolbar>
         </ion-header>
         <ion-content class="ion-padding modal">

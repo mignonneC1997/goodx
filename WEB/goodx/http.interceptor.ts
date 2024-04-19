@@ -11,10 +11,6 @@ constructor(private authService: StorageService) {}
 
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         // Get the authentication token from the AuthService
-        this.authService.getToken('userToken').then(result => {
-            this.authToken = result;
-        }).catch(err =>{})
-
         const token = localStorage.getItem('userToken');
 
         // Clone the request and add the token to the Authorization header
