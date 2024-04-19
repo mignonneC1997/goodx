@@ -29,7 +29,6 @@ export class BookingsPage implements OnInit, OnDestroy {
   }
   public viewTitle = '';
   public bookingSource:any = [];
-  public tempBookingSource:any = []
   public newBooking:any = {
     title: '',
     allDay: false,
@@ -229,7 +228,6 @@ export class BookingsPage implements OnInit, OnDestroy {
         this.bookingService.bookingWeb().pipe(takeUntil(this.destroy$)).subscribe({
           next: (response) => {
             this.isLoading = false;
-            this.tempBookingSource = response.data;
             response.data.map((item: any, index: string | number) => {
               if (response.data[index].cancelled === false) {
                 let startTime = new Date(response.data[index].start_time);
@@ -278,7 +276,6 @@ export class BookingsPage implements OnInit, OnDestroy {
           next: (response) => {
             this.isLoading = false;
             if (response.data.status === 'OK') {
-              this.tempBookingSource = response.data.data;
               response.data.data.map((item: any, index: string | number) => {
                 if (response.data.data[index].cancelled === false) {
                   let startTime = new Date(response.data.data[index].start_time);
@@ -354,9 +351,9 @@ export class BookingsPage implements OnInit, OnDestroy {
   onBookingSelected(ev:any) {
     this.updateEvent = true;
     const hyphenIndex = ev.title.indexOf(' - ');
-    const title = hyphenIndex !== -1 ? ev.title.substring(hyphenIndex + 3) : ev.title
+    const title = hyphenIndex !== -1 ? ev.title.substring(hyphenIndex + 3) : ev.title;
 
-    const foundObject = this.tempBookingSource.find((obj: { reason: number; }) => obj.reason === title);
+    const foundObject = this.bookingSource.find((obj: { uid: number; }) => obj.uid === ev.uid);
 
     this.selectedDuration = foundObject.duration;
 
@@ -404,6 +401,36 @@ export class BookingsPage implements OnInit, OnDestroy {
       if (Capacitor.getPlatform() === 'web') {
         this.bookingService.updateBookingWeb(updateData).pipe(takeUntil(this.destroy$)).subscribe({
           next: (response) => {
+            let startTime = new Date(this.newBooking.startTime);
+            let futureDate:any = new Date(startTime);
+            futureDate.setMinutes(startTime.getMinutes() + duration);
+            futureDate = format(futureDate, "yyyy-MM-dd'T'HH:mm:ss");
+
+            const toAdd: CalBooking = {
+              title: this.selectedPatient.name + ' - ' + this.bookingForm.get('reason')?.value,
+              allDay: false,
+              startTime: new Date(this.newBooking.startTime),
+              endTime: new Date(futureDate),
+              entity_uid: this.newBooking.entity_uid,
+              diary_uid: this.newBooking.diary_uid,
+              uid: this.newBooking.uid,
+              start_time: this.newBooking.startTime,
+              duration: updateData.duration,
+              patient_uid: this.bookingForm.get('patient_uid')?.value,
+              reason: this.bookingForm.get('reason')?.value,
+              booking_status_uid: this.bookingForm.get('booking_status_uid')?.value,
+              booking_type_uid: this.bookingForm.get('booking_type_uid')?.value
+            }
+
+            const index = this.bookingSource.findIndex((obj: { uid: any; }) => obj.uid === this.newBooking.uid);   
+            // If the object is found, update its value
+            if (index !== -1) {
+              this.bookingSource[index] = toAdd;
+            } else {
+                // Handle case where object with the specified key is not found
+                console.log("Object with custom key '" + this.newBooking.uid + "' not found.");
+            }
+            this.myCal.loadEvents();
             this.newBooking = {
               title: '',
               allDay: false,
@@ -419,8 +446,6 @@ export class BookingsPage implements OnInit, OnDestroy {
               reason: null,
               cancelled: false
             }
-            this.myCal.loadEvents();
-            this.getBookings();
             this.toasterService.displaySuccessToast('successfully updated booking');
           },
           error: (err: ErrorEvent) => {
@@ -437,6 +462,35 @@ export class BookingsPage implements OnInit, OnDestroy {
         this.bookingService.updateBookingNative(updateData).pipe(takeUntil(this.destroy$)).subscribe({
           next: (response) => {
             this.toasterService.displaySuccessToast('successfully updated booking');
+            let startTime = new Date(this.newBooking.startTime);
+            let futureDate:any = new Date(startTime);
+            futureDate.setMinutes(startTime.getMinutes() + duration);
+            futureDate = format(futureDate, "yyyy-MM-dd'T'HH:mm:ss");
+
+            const toAdd: CalBooking = {
+              title: this.selectedPatient.name + ' - ' + this.bookingForm.get('reason')?.value,
+              allDay: false,
+              startTime: new Date(this.newBooking.startTime),
+              endTime: new Date(futureDate),
+              entity_uid: this.newBooking.entity_uid,
+              diary_uid: this.newBooking.diary_uid,
+              uid: this.newBooking.uid,
+              start_time: this.newBooking.startTime,
+              duration: updateData.duration,
+              patient_uid: this.bookingForm.get('patient_uid')?.value,
+              reason: this.bookingForm.get('reason')?.value,
+              booking_status_uid: this.bookingForm.get('booking_status_uid')?.value,
+              booking_type_uid: this.bookingForm.get('booking_type_uid')?.value
+            }
+
+            const index = this.bookingSource.findIndex((obj: { uid: any; }) => obj.uid === this.newBooking.uid);   
+            // If the object is found, update its value
+            if (index !== -1) {
+              this.bookingSource[index] = toAdd;
+            } else {
+                // Handle case where object with the specified key is not found
+                console.log("Object with custom key '" + this.newBooking.uid + "' not found.");
+            }
             this.myCal.loadEvents();
             this.newBooking = {
               title: '',
@@ -453,7 +507,6 @@ export class BookingsPage implements OnInit, OnDestroy {
               reason: null,
               cancelled: false
             }
-            this.getBookings();
           },
           error: (err: ErrorEvent) => {
             this.isLoading = false;
@@ -504,6 +557,7 @@ export class BookingsPage implements OnInit, OnDestroy {
                   reason: null,
                   cancelled: false
                 }
+                this.getBookings();
                 this.myCal.loadEvents();
                 this.toasterService.displaySuccessToast('successfully deleted booking');
               },
@@ -537,6 +591,7 @@ export class BookingsPage implements OnInit, OnDestroy {
                   reason: null,
                   cancelled: false
                 }
+                this.getBookings();
                 this.myCal.loadEvents();
               },
               error: (err: ErrorEvent) => {
@@ -626,7 +681,6 @@ export class BookingsPage implements OnInit, OnDestroy {
                 let futureDate:any = new Date(startTime);
                 futureDate.setMinutes(startTime.getMinutes() + response.data.duration);
                 futureDate = format(futureDate, "yyyy-MM-dd'T'HH:mm:ss");
-                console.log(futureDate);
       
                 this.newBooking = {
                   title: '',
@@ -762,7 +816,6 @@ export class BookingsPage implements OnInit, OnDestroy {
     }
     this.viewTitle = '';
     this.bookingSource = [];
-    this.tempBookingSource = []
     this.newBooking = {
       title: '',
       allDay: false,
