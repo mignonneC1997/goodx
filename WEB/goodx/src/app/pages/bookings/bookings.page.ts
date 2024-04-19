@@ -385,96 +385,171 @@ export class BookingsPage implements OnInit, OnDestroy {
   }
 
   updateBooking() {
-    const duration = this.calculateDuration(this.newBooking.startTime, this.newBooking.endTime);
-    this.bookingForm.patchValue({ 'patient_uid': this.selectedPatient.uid , 'booking_status_uid': this.selectedBookingStatus.uid, 'booking_type_uid': this.selectedBookingType.uid, 'start_time': new Date(this.newBooking.startTime), 'duration': duration })
-    this.newBooking.duration = duration;
-    const updateData = {
-      uid: this.newBooking.uid,
-      start_time: this.newBooking.startTime,
-      duration: duration,
-      patient_uid: this.bookingForm.get('patient_uid')?.value,
-      reason: this.bookingForm.get('reason')?.value,
-      booking_status_uid: this.bookingForm.get('booking_status_uid')?.value,
-      booking_type_uid: this.bookingForm.get('booking_type_uid')?.value,
-      cancelled: false
-    }
-    if (Capacitor.getPlatform() === 'web') {
-      this.bookingService.updateBookingWeb(updateData).pipe(takeUntil(this.destroy$)).subscribe({
-        next: (response) => {
-          this.myCal.loadEvents();
-          this.getBookings();
-          this.toasterService.displaySuccessToast('successfully updated booking');
-        },
-        error: (err: ErrorEvent) => {
-          this.isLoading = false;
-          this.toasterService.displayErrorToast(err.error.status);
-        },
-        complete: () => {
-          this.isLoading = false;
-          this.modal.dismiss()
-          return;
-      }
-      });
+    if (this.selectedPatient.uid === null) {
+      this.toasterService.displayErrorToast(`Can't update appointmnet. No patient selected`);
     } else {
-      this.bookingService.updateBookingNative(updateData).pipe(takeUntil(this.destroy$)).subscribe({
-        next: (response) => {
-          this.toasterService.displaySuccessToast('successfully updated booking');
-          this.myCal.loadEvents();
-          this.getBookings();
-        },
-        error: (err: ErrorEvent) => {
-          this.isLoading = false;
-          this.toasterService.displayErrorToast(err.error.status);
-        },
-        complete: () => {
-          this.isLoading = false;
-          this.modal.dismiss()
-          return;
+      const duration = this.calculateDuration(this.newBooking.startTime, this.newBooking.endTime);
+      this.bookingForm.patchValue({ 'patient_uid': this.selectedPatient.uid , 'booking_status_uid': this.selectedBookingStatus.uid, 'booking_type_uid': this.selectedBookingType.uid, 'start_time': new Date(this.newBooking.startTime), 'duration': duration })
+      this.newBooking.duration = duration;
+      const updateData = {
+        uid: this.newBooking.uid,
+        start_time: this.newBooking.startTime,
+        duration: duration,
+        patient_uid: this.bookingForm.get('patient_uid')?.value,
+        reason: this.bookingForm.get('reason')?.value,
+        booking_status_uid: this.bookingForm.get('booking_status_uid')?.value,
+        booking_type_uid: this.bookingForm.get('booking_type_uid')?.value,
+        cancelled: false
+      }
+      if (Capacitor.getPlatform() === 'web') {
+        this.bookingService.updateBookingWeb(updateData).pipe(takeUntil(this.destroy$)).subscribe({
+          next: (response) => {
+            this.newBooking = {
+              title: '',
+              allDay: false,
+              startTime: null,
+              endTime: null,
+              entity_uid: 4,
+              diary_uid: 4,
+              booking_type_uid: null,
+              booking_status_uid: null,
+              start_time: null,
+              duration: null,
+              patient_uid: null,
+              reason: null,
+              cancelled: false
+            }
+            this.myCal.loadEvents();
+            this.getBookings();
+            this.toasterService.displaySuccessToast('successfully updated booking');
+          },
+          error: (err: ErrorEvent) => {
+            this.isLoading = false;
+            this.toasterService.displayErrorToast(err.error.status);
+          },
+          complete: () => {
+            this.isLoading = false;
+            this.modal.dismiss()
+            return;
         }
-      });
+        });
+      } else {
+        this.bookingService.updateBookingNative(updateData).pipe(takeUntil(this.destroy$)).subscribe({
+          next: (response) => {
+            this.toasterService.displaySuccessToast('successfully updated booking');
+            this.myCal.loadEvents();
+            this.newBooking = {
+              title: '',
+              allDay: false,
+              startTime: null,
+              endTime: null,
+              entity_uid: 4,
+              diary_uid: 4,
+              booking_type_uid: null,
+              booking_status_uid: null,
+              start_time: null,
+              duration: null,
+              patient_uid: null,
+              reason: null,
+              cancelled: false
+            }
+            this.getBookings();
+          },
+          error: (err: ErrorEvent) => {
+            this.isLoading = false;
+            this.toasterService.displayErrorToast(err.error.status);
+          },
+          complete: () => {
+            this.isLoading = false;
+            this.modal.dismiss()
+            return;
+          }
+        });
+      }
     }
   }
 
   removeBooking() {
-    const duration = this.calculateDuration(this.newBooking.startTime, this.newBooking.endTime);
-    this.bookingForm.patchValue({ 'patient_uid': this.selectedPatient.uid , 'booking_status_uid': this.selectedBookingStatus.uid, 'booking_type_uid': this.selectedBookingType.uid, 'start_time': new Date(this.newBooking.startTime), 'duration': duration })
-    this.newBooking.duration = duration;
-    const updateData = {
-      uid: this.newBooking.uid,
-      cancelled: true
-    }
-    if (Capacitor.getPlatform() === 'web') {
-      this.bookingService.removeBookingWeb(updateData).pipe(takeUntil(this.destroy$)).subscribe({
-        next: (response) => {
-          this.myCal.loadEvents();
-          this.getBookings();
-          this.toasterService.displaySuccessToast('successfully deleted booking');
-        },
-        error: (err: ErrorEvent) => {
-          this.isLoading = false;
-          this.toasterService.displayErrorToast(err.error.status);
-        },
-        complete: () => {
-          this.isLoading = false;
-          this.modal.dismiss()
-          return;
-      }
-      });
+    if (this.selectedPatient.uid === null) {
+      this.toasterService.displayErrorToast(`Can't remove appointmnet. No patient selected`);
     } else {
-      this.bookingService.removeBookingNative(updateData).pipe(takeUntil(this.destroy$)).subscribe({
-        next: (response) => {
-          this.toasterService.displaySuccessToast('successfully deleted booking');
-          this.myCal.loadEvents();
-          this.getBookings();
-        },
-        error: (err: ErrorEvent) => {
-          this.isLoading = false;
-          this.toasterService.displayErrorToast(err.error.status);
-        },
-        complete: () => {
-          this.isLoading = false;
-          this.modal.dismiss()
+      const duration = this.calculateDuration(this.newBooking.startTime, this.newBooking.endTime);
+      this.newBooking.duration = duration;
+      this.bookingForm.patchValue({ 'patient_uid': this.selectedPatient.uid , 'booking_status_uid': this.selectedBookingStatus.uid, 'booking_type_uid': this.selectedBookingType.uid, 'start_time': new Date(this.newBooking.startTime), 'duration': duration })
+      this.newBooking.duration = duration;
+      const updateData = {
+        uid: this.newBooking.uid,
+        cancelled: true
+      }
+      this.toasterService.confirmBookingPrompt('Delete Booking').then((res) => {
+        if (res === false) {
           return;
+        } else {
+          if (Capacitor.getPlatform() === 'web') {
+            this.bookingService.removeBookingWeb(updateData).pipe(takeUntil(this.destroy$)).subscribe({
+              next: (response) => {
+                this.bookingSource = this.bookingSource.filter((item: { uid: number; }) => item.uid !== this.newBooking.uid);
+                this.newBooking = {
+                  title: '',
+                  allDay: false,
+                  startTime: null,
+                  endTime: null,
+                  entity_uid: 4,
+                  diary_uid: 4,
+                  booking_type_uid: null,
+                  booking_status_uid: null,
+                  start_time: null,
+                  duration: null,
+                  patient_uid: null,
+                  reason: null,
+                  cancelled: false
+                }
+                this.myCal.loadEvents();
+                this.toasterService.displaySuccessToast('successfully deleted booking');
+              },
+              error: (err: ErrorEvent) => {
+                this.isLoading = false;
+                this.toasterService.displayErrorToast(err.error.status);
+              },
+              complete: () => {
+                this.isLoading = false;
+                this.modal.dismiss()
+                return;
+            }
+            });
+          } else {
+            this.bookingService.removeBookingNative(updateData).pipe(takeUntil(this.destroy$)).subscribe({
+              next: (response) => {
+                this.toasterService.displaySuccessToast('successfully deleted booking');
+                this.bookingSource = this.bookingSource.filter((item: { uid: number; }) => item.uid !== this.newBooking.uid);
+                this.newBooking = {
+                  title: '',
+                  allDay: false,
+                  startTime: null,
+                  endTime: null,
+                  entity_uid: 4,
+                  diary_uid: 4,
+                  booking_type_uid: null,
+                  booking_status_uid: null,
+                  start_time: null,
+                  duration: null,
+                  patient_uid: null,
+                  reason: null,
+                  cancelled: false
+                }
+                this.myCal.loadEvents();
+              },
+              error: (err: ErrorEvent) => {
+                this.isLoading = false;
+                this.toasterService.displayErrorToast(err.error.status);
+              },
+              complete: () => {
+                this.isLoading = false;
+                this.modal.dismiss()
+                return;
+              }
+            });
+          }
         }
       });
     }
@@ -490,16 +565,19 @@ export class BookingsPage implements OnInit, OnDestroy {
 
   selectedPatientObject(ev: any) {
     this.selectedPatient = ev.detail.value;
+    this.newBooking.patient_uid = ev.detail.value.uid;
     this.bookingForm.patchValue({selectedPatient:  ev.detail.value, patient_uid: ev.detail.value.uid});
   }
 
   selectedStatusObject(ev: any) {
     this.selectedBookingStatus = ev.detail.value;
+    this.newBooking.booking_status_uid = ev.detail.value.uid;
     this.bookingForm.patchValue({selectedBookingStatus:  ev.detail.value, booking_status_uid: ev.detail.value.uid});
   }
 
   selectedTypeObject(ev: any) {
     this.selectedBookingType = ev.detail.value;
+    this.newBooking.booking_type_uid = ev.detail.value.uid;
     this.bookingForm.patchValue({selectedBookingType:  ev.detail.value, booking_type_uid: ev.detail.value.uid});
   }
 
@@ -517,7 +595,7 @@ export class BookingsPage implements OnInit, OnDestroy {
   }
 
   scheduleBooking() {
-    this.toasterService.confirmBookingPrompt('Confirm booking').then((res) => {
+    this.toasterService.confirmBookingPrompt('Confirm Booking').then((res) => {
       if (res === false) {
         return;
       } else {
@@ -525,9 +603,9 @@ export class BookingsPage implements OnInit, OnDestroy {
         let uniqueArray: CalBooking[] = [];
         let patient: any = '';
         const duration = this.calculateDuration(this.newBooking.startTime, this.newBooking.endTime);
-        this.bookingForm.patchValue({duration : duration, start_time: this.newBooking.startTime });
+        this.bookingForm.patchValue({duration : duration });
         this.updateEvent = true;
-        this.newBooking.start_time = new Date(this.newBooking.startTime);
+        this.newBooking.start_time = this.bookingForm.get('start_time')?.value;
         this.newBooking.duration = duration;
         this.newBooking.booking_status_uid = this.bookingForm.get('booking_status_uid')?.value;
         this.newBooking.booking_type_uid = this.bookingForm.get('booking_type_uid')?.value;
@@ -537,6 +615,7 @@ export class BookingsPage implements OnInit, OnDestroy {
         delete this.newBooking['endTime'];
         delete this.newBooking['allDay'];
         delete this.newBooking['title'];
+        delete this.newBooking['uid'];
         if (this.bookingForm.valid) { // VALID FORM VALUES
           if (Capacitor.getPlatform() === 'web') {
             this.bookingService.makeBookingWeb(this.newBooking).pipe(takeUntil(this.destroy$)).subscribe({
@@ -547,6 +626,7 @@ export class BookingsPage implements OnInit, OnDestroy {
                 let futureDate:any = new Date(startTime);
                 futureDate.setMinutes(startTime.getMinutes() + response.data.duration);
                 futureDate = format(futureDate, "yyyy-MM-dd'T'HH:mm:ss");
+                console.log(futureDate);
       
                 this.newBooking = {
                   title: '',
@@ -583,7 +663,6 @@ export class BookingsPage implements OnInit, OnDestroy {
                 uniqueArray.push(toAdd);
                 this.bookingSource.push(toAdd);
                 this.myCal.loadEvents();
-                this.getBookings();
               },
               error: (err: ErrorEvent) => {
                 this.isLoading = false;
@@ -641,7 +720,6 @@ export class BookingsPage implements OnInit, OnDestroy {
                 uniqueArray.push(toAdd);
                 this.bookingSource.push(toAdd);
                 this.myCal.loadEvents();
-                this.getBookings();
               },
               error: (err: ErrorEvent) => {
                 this.isLoading = false;

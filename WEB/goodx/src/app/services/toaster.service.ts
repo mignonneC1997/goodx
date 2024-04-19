@@ -61,14 +61,14 @@ export class ToastmessageService {
       cssClass: 'bookingPrompt',
       buttons: [
         {
-          text: 'Continue',
+          text: 'Yes',
           handler: () => {
             response = true;
             alert.dismiss(true);
           }
         },
         {
-          text: 'Close',
+          text: 'No',
           handler: () => {
             response = false;
             alert.dismiss(true);

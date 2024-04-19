@@ -24,7 +24,7 @@ export class PatientsService {
   }
 
   public patientsNative = (): Observable<any> => {
-    const url = environment.urlNative + 'patient?fields=["entity_uid","id","debtor_uid","name","surname","initials","title","date_of_birth","mobile_no","gender","benefit_check"]';
+    const url = environment.urlNative + 'patient?fields=["entity_uid","id","debtor_uid","name","surname","initials","title","date_of_birth","mobile_no","gender","benefit_check","id_no","email","file_no","dependant_no","dependant_type","acc_identifier","private"]';
     const options: HttpOptions = {
       headers: {
         'Content-Type': 'application/json',
