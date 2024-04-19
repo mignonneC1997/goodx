@@ -107,18 +107,32 @@ export class BookingsService {
     });
   }
 
-  public removeBookingWeb = (): Observable<any> => {
-      return this.http.get<any>(environment.urlWeb + 'patient?fields=["entity_uid","id","debtor_uid","name","surname","initials","title","date_of_birth","mobile_no","gender","benefit_check"]', { headers: this.httpHeaderService.getHTTPHeaders(), observe: 'response' }).pipe(
+  public removeBookingWeb = (data: any): Observable<any> => {
+    const uid = data.uid;
+    const putData = {
+      model: {
+        uid: data.uid,
+        cancelled: true
+      }
+    }
+    return this.http.put<any>(environment.urlWeb + `booking/${uid}`, putData, { headers: this.httpHeaderService.getHTTPHeaders(), observe: 'response' }).pipe(
       map((response: HttpResponse<any>) => {
         return response.body;
       }), catchError((error: HttpErrorResponse) => {
         return throwError(() => error);
       })
-      ); 
+    ); 
   }
 
-  public removeBookingNative = (): Observable<any> => {
-    const url = environment.urlNative + 'patient?fields=["entity_uid","id","debtor_uid","name","surname","initials","title","date_of_birth","mobile_no","gender","benefit_check"]';
+  public removeBookingNative = (data:any): Observable<any> => {
+    const uid = data.uid;
+    const putData = {
+      model: {
+        uid: data.uid,
+        cancelled: true
+      }
+    }
+    const url = environment.urlNative + `booking/${uid}`;
     const options: HttpOptions = {
       headers: {
         'Content-Type': 'application/json',
@@ -126,11 +140,12 @@ export class BookingsService {
         'Access-Control-Allow-Origin': '*'
       },
       url,
-      method: 'GET'
+      method: 'PUT',
+      data: putData
     }
 
     return new Observable(observer => {
-      from(Http.get(options)
+      from(Http.put(options)
         .then(response => {
           observer.next(response); // Emit the response
           observer.complete();    // Complete the Observable

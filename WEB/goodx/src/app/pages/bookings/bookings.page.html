@@ -171,7 +171,12 @@
             [value]="newBooking.endTime"
             [presentation]="newBooking.allDay ? 'date' : 'time-date'"
             (ionChange)="endChanged(end.value)"></ion-datetime>
-          </div>         
+          </div> 
+          <ion-fab *ngIf="updateEvent" horizontal="center" vertical="bottom" horizontal="end" slot="fixed" >
+            <ion-fab-button color="danger" (click)="removeBooking()">
+              <ion-icon name="trash"></ion-icon>
+            </ion-fab-button>
+          </ion-fab>        
         </ion-content>
       </ng-template>
     </ion-modal>
