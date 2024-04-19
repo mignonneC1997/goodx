@@ -5,7 +5,7 @@ import { Router } from '@angular/router';
 import { Capacitor } from '@capacitor/core';;
 import { ReplaySubject, takeUntil } from 'rxjs';
 
-import { LoginService } from '../../services/login.service';
+import { AuthService } from '../../services/auth.service';
 import {  ToastmessageService } from '../../services/toaster.service';
 import { timeout } from '../../../../config';
 
@@ -33,7 +33,7 @@ export class LoginPage implements OnInit, OnDestroy {
   public isLoading: boolean = false;
   private destroy$: ReplaySubject<boolean> = new ReplaySubject(1);
 
-  constructor(private formBuilder: FormBuilder, private router: Router, private loginApi: LoginService, private toasterService: ToastmessageService) {}
+  constructor(private formBuilder: FormBuilder, private router: Router, private loginApi: AuthService, private toasterService: ToastmessageService) {}
 
   ngOnInit() {
     this.buildForm();
