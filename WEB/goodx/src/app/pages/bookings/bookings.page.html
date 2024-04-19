@@ -15,12 +15,14 @@
 </ion-header>
 
 <ion-content [fullscreen]="true" mode="ios">
+  <!-- MONTH, WEEK, DAY TABS -->
   <ion-segment [(ngModel)]="calendar.mode" mode="ios">
     <ion-segment-button value="month">Month</ion-segment-button>
     <ion-segment-button value="week">Week</ion-segment-button>
     <ion-segment-button value="day">Day</ion-segment-button>
   </ion-segment>
 
+  <!-- CALENDAR NAVIGATION BUTTONS -->
   <ion-row>
     <ion-col size="2">
       <ion-button fill="clear" (click)="calendarBack()">
@@ -36,7 +38,8 @@
       </ion-button>
     </ion-col>
   </ion-row>
-
+  
+  <!-- CALENDAR COMPONENT (BOOKINGS) -->
   <calendar
   [eventSource]="bookingSource"
   [calendarMode]="calendar.mode"
@@ -49,35 +52,34 @@
   (onEventSelected)="onBookingSelected($event)"
   [monthviewDisplayEventTemplate]="monthviewTemplate"
   [weekviewAllDayEventTemplate]="weekviewTemplate"
-  > </calendar>
+  ></calendar>
 
+  <!-- BOOKING FORM -->
   <form [formGroup]="bookingForm">
-
     <ion-fab horizontal="center" vertical="bottom" horizontal="end" slot="fixed" >
       <ion-fab-button (click)="openAddModal()">
         <ion-icon name="add"></ion-icon>
       </ion-fab-button>
     </ion-fab>
 
-    <ion-modal #modal
+    <!-- ADD BOOKINGS -->
+    <ion-modal #modalAdd
     [presentingElement]="presentingElement">
       <ng-template>
         <ion-header>
           <ion-toolbar>
             <ion-buttons slot="start">
-              <ion-button (click)="modal.dismiss()" >Cancel
+              <ion-button (click)="modalAdd.dismiss()" >Cancel
               </ion-button>
             </ion-buttons>
             <ion-buttons slot="end">
-              <ion-button *ngIf="!updateEvent" (click)="scheduleBooking()" color="primary">Add</ion-button>
-                <ion-button *ngIf="updateEvent" (click)="updateBooking()" color="danger">Update</ion-button>
+              <ion-button (click)="scheduleBooking()" color="primary">Add</ion-button>
             </ion-buttons>
-            <ion-title class="ion-text-center" *ngIf="!updateEvent">New Booking</ion-title>
-            <ion-title class="ion-text-center" *ngIf="updateEvent && selectedPatient" color="primary">Appointment</ion-title>
+            <ion-title class="ion-text-center">New Booking</ion-title>
           </ion-toolbar>
         </ion-header>
         <ion-content class="ion-padding modal">
-          <ion-card *ngIf="updateEvent && selectedPatient"  (click)="openUserModal()">
+          <ion-card *ngIf="selectedPatient"  (click)="openUserModal()">
             <ion-list>
               <ion-item class="user-item">
                 <ion-avatar slot="start">
@@ -94,7 +96,6 @@
                   <p class="user-info">Title: {{ selectedPatient.title }}</p>
                   <p class="user-info">Date of Birth: {{ selectedPatient.date_of_birth }}</p>
                   <p class="user-info">Mobile No: {{ selectedPatient.mobile_no }}</p>
-                  <!-- Add more user details here as needed -->
                 </ion-label>
               </ion-item>
             </ion-list>
@@ -102,14 +103,12 @@
           <div class="group">
             <ion-label>Reason:</ion-label>
             <ion-input type="text" formControlName="reason"/>
-            <!-- <span class="error ion-padding errorSpan" *ngIf="errorControl && errorControl['reason'] && errorControl['reason'].errors && errorControl['reason'].errors['required']">*required</span> -->
           </div>
           <div class="group">
             <!-- Dropdown menu for patient list -->
             <ion-item>
               <ion-label>Select Patient:</ion-label>
               <ion-select interface="action-sheet" formControlName="selectedPatient" (ionChange)="selectedPatientObject($event)">
-                <!-- Loop through patientList and display their titles -->
                 <ion-select-option *ngFor="let patient of patientList" [value]="patient">
                   {{ patient.name }} - {{ patient.surname}}
                 </ion-select-option>
@@ -121,7 +120,6 @@
             <ion-item>
               <ion-label>Select booking type:</ion-label>
               <ion-select interface="action-sheet" formControlName="selectedBookingType" (ionChange)="selectedTypeObject($event)">
-                <!-- Loop through patientList and display their titles -->
                 <ion-select-option *ngFor="let type of bookingTypes" [value]="type">
                   {{ type.name }}
                 </ion-select-option>
@@ -129,11 +127,10 @@
             </ion-item>
           </div>
           <div class="group">
-            <!-- Dropdown menu for bookingTypes -->
+            <!-- Dropdown menu for bookingStatuses -->
             <ion-item>
               <ion-label>Select booking status:</ion-label>
               <ion-select interface="action-sheet" formControlName="selectedBookingStatus" (ionChange)="selectedStatusObject($event)">
-                <!-- Loop through patientList and display their titles -->
                 <ion-select-option *ngFor="let status of bookingStatuses" [value]="status">
                   {{ status.name }}
                 </ion-select-option>
@@ -157,6 +154,7 @@
               <ion-label>Starts</ion-label>
               <ion-text slot="end">{{formattedStart}}</ion-text>
             </ion-item>
+            <!-- START DATE - DATE PICKER -->
             <ion-datetime #start *ngIf="showStart"
             formControlName="start_time"
             [value]="newBooking.startTime"
@@ -167,12 +165,127 @@
               <ion-label>Ends</ion-label>
               <ion-text slot="end">{{formattedEnd}}</ion-text>
             </ion-item>
+            <!-- END DATE - DATE PICKER -->
             <ion-datetime #end *ngIf="showEnd" 
             [value]="newBooking.endTime"
             [presentation]="newBooking.allDay ? 'date' : 'time-date'"
             (ionChange)="endChanged(end.value)"></ion-datetime>
-          </div> 
-          <ion-fab *ngIf="updateEvent" horizontal="center" vertical="bottom" horizontal="end" slot="fixed" >
+          </div>       
+        </ion-content>
+      </ng-template>
+    </ion-modal>
+
+    <!-- EDIT/DELETE BOOKINGS -->
+    <ion-modal #modalEdit
+    [presentingElement]="presentingElement">
+      <ng-template>
+        <ion-header>
+          <ion-toolbar>
+            <ion-buttons slot="start">
+              <ion-button (click)="modalEdit.dismiss()" >Cancel
+              </ion-button>
+            </ion-buttons>
+            <ion-buttons slot="end">
+                <ion-button (click)="updateBooking()" color="danger">Update</ion-button>
+            </ion-buttons>
+            <ion-title class="ion-text-center" *ngIf="selectedPatient" color="primary">Appointment</ion-title>
+          </ion-toolbar>
+        </ion-header>
+        <ion-content class="ion-padding modal">
+          <ion-card *ngIf="selectedPatient"  (click)="openUserModal()">
+            <ion-list>
+              <ion-item class="user-item">
+                <ion-avatar slot="start">
+                  <!-- Display different avatar images based on user's gender -->
+                  <ng-container *ngIf="selectedPatient.gender === 'male'">
+                    <img src="../../../assets/images/male.png" alt="Male Avatar">
+                  </ng-container>
+                  <ng-container *ngIf="selectedPatient.gender === 'female'">
+                    <img src="../../../assets/images/female.png" alt="Female Avatar">
+                  </ng-container>
+                </ion-avatar>
+                <ion-label>
+                  <h2>{{ selectedPatient.name }} {{ selectedPatient.surname }}</h2>
+                  <p class="user-info">Title: {{ selectedPatient.title }}</p>
+                  <p class="user-info">Date of Birth: {{ selectedPatient.date_of_birth }}</p>
+                  <p class="user-info">Mobile No: {{ selectedPatient.mobile_no }}</p>
+                </ion-label>
+              </ion-item>
+            </ion-list>
+          </ion-card>
+          <div class="group">
+            <ion-label>Reason:</ion-label>
+            <ion-input type="text" formControlName="reason"/>
+          </div>
+          <div class="group">
+            <!-- Dropdown menu for patient list -->
+            <ion-item>
+              <ion-label>Select Patient:</ion-label>
+              <ion-select interface="action-sheet" formControlName="selectedPatient" (ionChange)="selectedPatientObject($event)">
+                <ion-select-option *ngFor="let patient of patientList" [value]="patient">
+                  {{ patient.name }} - {{ patient.surname}}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+          </div>
+          <div class="group">
+            <!-- Dropdown menu for bookingTypes -->
+            <ion-item>
+              <ion-label>Select booking type:</ion-label>
+              <ion-select interface="action-sheet" formControlName="selectedBookingType" (ionChange)="selectedTypeObject($event)">
+                <ion-select-option *ngFor="let type of bookingTypes" [value]="type">
+                  {{ type.name }}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+          </div>
+          <div class="group">
+            <!-- Dropdown menu for bookingStatuses -->
+            <ion-item>
+              <ion-label>Select booking status:</ion-label>
+              <ion-select interface="action-sheet" formControlName="selectedBookingStatus" (ionChange)="selectedStatusObject($event)">
+                <ion-select-option *ngFor="let status of bookingStatuses" [value]="status">
+                  {{ status.name }}
+                </ion-select-option>
+              </ion-select>
+            </ion-item>
+          </div>
+          <div class="group">
+            <ion-item>
+              <ion-label>
+                Duration (min):
+              </ion-label>
+              <ion-input class="ion-text-end" formControlName="duration"/>
+            </ion-item>
+            <ion-item>
+              <ion-label>
+                All Day
+              </ion-label>
+              <ion-toggle formControlName="allDay"></ion-toggle>
+            </ion-item>
+            <ion-item (click)="showStart = !showStart">
+              <ion-label>Starts</ion-label>
+              <ion-text slot="end">{{formattedStart}}</ion-text>
+            </ion-item>
+            <!-- START DATE - DATE PICKER -->
+            <ion-datetime #start *ngIf="showStart"
+            formControlName="start_time"
+            [value]="newBooking.startTime"
+            [presentation]="newBooking.allDay ? 'date' : 'time-date'"
+            (ionChange)="startChanged(start.value)"></ion-datetime>
+
+            <ion-item (click)="showEnd = !showEnd">
+              <ion-label>Ends</ion-label>
+              <ion-text slot="end">{{formattedEnd}}</ion-text>
+            </ion-item>
+            <!-- END DATE - DATE PICKER -->
+            <ion-datetime #end *ngIf="showEnd" 
+            [value]="newBooking.endTime"
+            [presentation]="newBooking.allDay ? 'date' : 'time-date'"
+            (ionChange)="endChanged(end.value)"></ion-datetime>
+          </div>
+          <!-- DELETE BOOKING -->
+          <ion-fab horizontal="center" vertical="bottom" horizontal="end" slot="fixed" >
             <ion-fab-button color="danger" (click)="removeBooking()">
               <ion-icon name="trash"></ion-icon>
             </ion-fab-button>
@@ -182,6 +295,7 @@
     </ion-modal>
   </form>
 
+    <!-- PATIENT PROFILE -->
   <ion-modal #patientModal [presentingElement]="presentingElement">
     <ng-template>
       <ion-header>
@@ -302,17 +416,19 @@
     </ng-template>
   </ion-modal>
 
+  <!-- MONTH VIEW - CALENDAR TEMPLATE -->
   <ng-template #monthviewTemplate let-view="view" let-row="row" let-col="col">
     <div class="booking-container">
-     {{view.dates[row*7+col].label}}
-     <div class="indicator-container">
-      <div class="booking-indicator" *ngFor="let e of view.dates[row*7+col].events">
-        *
+      {{view.dates[row*7+col].label}}
+      <div class="indicator-container">
+        <div class="booking-indicator" *ngFor="let e of view.dates[row*7+col].events">
+          *
+        </div>
       </div>
-     </div>
     </div>
   </ng-template>
 
+  <!-- WEEK VIEW - CALENDAR TEMPLATE -->
   <ng-template #weekviewTemplate let-displayEvent="displayEvent">
     <div class="calendar-event-inner week-event">{{displayEvent.event.title}}</div>
   </ng-template>
