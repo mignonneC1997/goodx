@@ -1,0 +1,5 @@
+{
+  "dependencies": {
+    "@types/swiper": "^6.0.0"
+  }
+}

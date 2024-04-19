@@ -71,7 +71,7 @@ export class LoginPage implements OnInit, OnDestroy {
             this.saveToken(response.data.uid);
             localStorage.setItem('userToken', response.data.uid);
             this.toasterService.displaySuccessToast('successfully logged in');
-            this.router.navigate(['/dashboard']);
+            this.router.navigate(['/bookings']);
           },
           error: (err: ErrorEvent) => {
             this.isLoading = false;
@@ -90,7 +90,7 @@ export class LoginPage implements OnInit, OnDestroy {
               console.log(response.data.data.uid);
               this.saveToken(response.data.data.uid);
               this.toasterService.displaySuccessToast('successfully logged in');
-              this.router.navigate(['/dashboard']);
+              this.router.navigate(['/bookings']);
             } else {
               this.toasterService.displayErrorToast(response.data.status);
             }

@@ -28,6 +28,9 @@
 @import 'swiper/scss';
 @import '@ionic/angular/css/ionic-swiper';
 
+@import 'swiper/swiper-bundle.css';
+@import 'swiper/swiper-bundle.min.css';
+
 .calendar-event {
     width: 100% !important;
 }

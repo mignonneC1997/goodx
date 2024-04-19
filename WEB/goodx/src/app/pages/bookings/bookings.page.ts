@@ -1,26 +1,25 @@
-/* eslint-disable @angular-eslint/no-empty-lifecycle-method */
 import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { CalendarMode, CalendarComponent  } from 'ionic6-calendar';
-import { takeUntil, ReplaySubject } from 'rxjs';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Capacitor } from '@capacitor/core';
-import { LoginService } from '../../services/login.service';
-import {  ToastmessageService } from '../../services/toaster.service';
-import { CalBooking, StorageService, } from '../../services/storage.service';
-import { IonRouterOutlet, LoadingController } from '@ionic/angular';
-import { IonModal } from '@ionic/angular';
+import { IonModal, LoadingController, IonRouterOutlet } from '@ionic/angular';
 import { format, parseISO } from 'date-fns';
-import { BookingsService } from '../../services/bookings.service';
-import { PatientsService } from '../../services/patients.service';
+import { CalendarComponent, CalendarMode } from 'ionic6-calendar';
+import { ReplaySubject, takeUntil } from 'rxjs';
+import { BookingsService } from 'src/app/services/bookings.service';
+import { LoginService } from 'src/app/services/login.service';
+import { PatientsService } from 'src/app/services/patients.service';
+import { CalBooking, StorageService } from 'src/app/services/storage.service';
+import { ToastmessageService } from 'src/app/services/toaster.service';
 
 @Component({
-  selector: 'app-dashboard',
-  templateUrl: './dashboard.page.html',
-  styleUrls: ['./dashboard.page.scss'],
+  selector: 'app-bookings',
+  templateUrl: './bookings.page.html',
+  styleUrls: ['./bookings.page.scss'],
 })
-export class DashboardPage implements OnInit, OnDestroy {
-  @ViewChild(IonModal) modal!: IonModal;
+export class BookingsPage implements OnInit, OnDestroy {
+  @ViewChild('modal') modal!: IonModal;
+  @ViewChild('patientModal') patientModal!: IonModal;
   @ViewChild(CalendarComponent) myCal!: CalendarComponent;
   presentingElement:any = null;
   public bookingForm!: FormGroup;
@@ -65,20 +64,15 @@ export class DashboardPage implements OnInit, OnDestroy {
     private storageS: StorageService, private router: Router, private ionRouterOutlet: IonRouterOutlet,
     private bookingService: BookingsService, private patientsApi: PatientsService, private loadingCtrl: LoadingController) {
       this.presentingElement = ionRouterOutlet.nativeEl;
-    }
-
-  async ngOnInit() {
-    this.buildForm();
   }
-
-  openBooking() {
-    this.router.navigate(['/bookings']);
+  ngOnInit(): void {
+    this.buildForm();
   }
 
   async ionViewDidEnter() {
     this.getPatients();
-    this.getBookingStatuses();
     this.getBookingTypes();
+    this.getBookingStatuses();
   }
 
   buildForm() {
@@ -97,134 +91,6 @@ export class DashboardPage implements OnInit, OnDestroy {
       selectedBookingStatus: [null, Validators.required],
       allDay: [false, Validators.required],
     });
-  }
-
-  get errorControl() {
-    return this.bookingForm.controls;
-  }
-
-  getPatients() {
-    this.isLoading = true;
-    if (Capacitor.getPlatform() === 'web') {
-      this.patientsApi.patientsWeb().pipe(takeUntil(this.destroy$)).subscribe({
-        next: (response) => {
-          this.getBookings();
-          this.isLoading = false;
-          this.patientList = response.data;
-        },
-        error: (err: ErrorEvent) => {
-          this.isLoading = false;
-          this.toasterService.displayErrorToast(err.error.status);
-        },
-        complete: () => {
-          return;
-        }
-      });
-    } else {
-      this.patientsApi.patientsNative().pipe(takeUntil(this.destroy$)).subscribe({
-        next: (response) => {
-          this.isLoading = false;
-          if (response.data.status === 'OK') {
-            this.patientList = response.data.data;
-          } else {
-            this.toasterService.displayErrorToast(response.data.status);
-          }
-        },
-        error: (err: ErrorEvent) => {
-          this.isLoading = false;
-          this.toasterService.displayErrorToast(err.error.status);
-        },
-        complete: () => {
-          return;
-        }
-      });
-    }
-  }
-
-  getBookings() {
-    this.isLoading = true;
-    let uniqueArray: CalBooking[] = [];
-    let patientObject: any =[];
-    let patient: any = '';
-      if (Capacitor.getPlatform() === 'web') {
-        this.bookingService.bookingWeb().pipe(takeUntil(this.destroy$)).subscribe({
-          next: (response) => {
-            this.isLoading = false;
-            this.tempBookingSource = response.data;
-            response.data.map((item: any, index: string | number) => {
-              let startTime = new Date(response.data[index].start_time);
-              let futureDate:any = new Date(startTime);
-              futureDate.setMinutes(startTime.getMinutes() + response.data[index].duration);
-              futureDate = format(futureDate, "yyyy-MM-dd'T'HH:mm:ss");
-              if (response.data[index].patient_uid !== null) {
-                patientObject = this.patientList.find((obj: { [x: string]: any; }) => obj['uid'] === response.data[index].patient_uid);
-                patient = patientObject.name;  
-              }
-              const toAdd: CalBooking = {
-                title: patient + ' - ' + response.data[index].reason,
-                allDay: false,
-                startTime: new Date(response.data[index].start_time),
-                endTime: new Date(futureDate),
-              }
-
-              uniqueArray.push(toAdd);
-            });
-            this.bookingSource = uniqueArray.filter((obj: { title: any; }, index: any, self: any[]) =>
-              index === self.findIndex((t) => (
-                  t.title === obj.title
-              ))
-            );
-          },
-          error: (err: ErrorEvent) => {
-            this.isLoading = false;
-            this.toasterService.displayErrorToast(err.error.status);
-          },
-          complete: () => {
-            return;
-          }
-        });
-      } else {
-        this.bookingService.bookingsNative().pipe(takeUntil(this.destroy$)).subscribe({
-          next: (response) => {
-            this.isLoading = false;
-            if (response.data.status === 'OK') {
-              this.tempBookingSource = response.data.data;
-              response.data.map((item: any, index: string | number) => {
-                let startTime = new Date(response.data[index].start_time);
-                let futureDate:any = new Date(startTime);
-                futureDate.setMinutes(startTime.getMinutes() + response.data[index].duration);
-                futureDate = format(futureDate, "yyyy-MM-dd'T'HH:mm:ss");          
-                if (response.data[index].patient_uid !== null) {
-                  patientObject = this.patientList.find((obj: { [x: string]: any; }) => obj['uid'] === response.data[index].patient_uid);
-                  patient = patientObject.name;  
-                }
-                const toAdd: CalBooking = {
-                  title: response.data[index].reason + patient,
-                  allDay: false,
-                  startTime: new Date(response.data[index].start_time),
-                  endTime: new Date(futureDate),
-                }
-  
-                uniqueArray.push(toAdd);
-              });
-              this.bookingSource = uniqueArray.filter((obj: { title: any; }, index: any, self: any[]) =>
-                index === self.findIndex((t) => (
-                    t.title === obj.title
-                ))
-              );
-            } else {
-              this.toasterService.displayErrorToast(response.data.status);
-            }
-          },
-          error: (err: ErrorEvent) => {
-            this.isLoading = false;
-            this.toasterService.displayErrorToast(err.error.status);
-          },
-          complete: () => {
-            return;
-          }
-        });
-      }
   }
 
   getBookingStatuses() {
@@ -309,6 +175,134 @@ export class DashboardPage implements OnInit, OnDestroy {
     this.modal.present();
   }
 
+  async openUserModal() {
+    console.log('test');
+    await this.modal.dismiss();
+    this.patientModal.present();
+  }
+
+  getPatients() {
+    this.isLoading = true;
+    if (Capacitor.getPlatform() === 'web') {
+      this.patientsApi.patientsWeb().pipe(takeUntil(this.destroy$)).subscribe({
+        next: (response) => {
+          this.getBookings();
+          this.isLoading = false;
+          this.patientList = response.data;
+        },
+        error: (err: ErrorEvent) => {
+          this.isLoading = false;
+          this.toasterService.displayErrorToast(err.error.status);
+        },
+        complete: () => {
+          return;
+        }
+      });
+    } else {
+      this.patientsApi.patientsNative().pipe(takeUntil(this.destroy$)).subscribe({
+        next: (response) => {
+          this.isLoading = false;
+          if (response.data.status === 'OK') {
+            this.getBookings();
+            this.patientList = response.data.data;
+          } else {
+            this.toasterService.displayErrorToast(response.data.status);
+          }
+        },
+        error: (err: ErrorEvent) => {
+          this.isLoading = false;
+          this.toasterService.displayErrorToast(err.error.status);
+        },
+        complete: () => {
+          return;
+        }
+      });
+    }
+  }
+
+  getBookings() {
+    this.isLoading = true;
+    let uniqueArray: CalBooking[] = [];
+    let patientObject: any =[];
+    let patient: any = '';
+      if (Capacitor.getPlatform() === 'web') {
+        this.bookingService.bookingWeb().pipe(takeUntil(this.destroy$)).subscribe({
+          next: (response) => {
+            this.isLoading = false;
+            this.tempBookingSource = response.data;
+            response.data.map((item: any, index: string | number) => {
+              let startTime = new Date(response.data[index].start_time);
+              let futureDate:any = new Date(startTime);
+              futureDate.setMinutes(startTime.getMinutes() + response.data[index].duration);
+              futureDate = format(futureDate, "yyyy-MM-dd'T'HH:mm:ss");
+              if (response.data[index].patient_uid !== null) {
+                patientObject = this.patientList.find((obj: { [x: string]: any; }) => obj['uid'] === response.data[index].patient_uid);
+                patient = patientObject.name;  
+              }
+              const toAdd: CalBooking = {
+                title: patient + ' - ' + response.data[index].reason,
+                allDay: false,
+                startTime: new Date(response.data[index].start_time),
+                endTime: new Date(futureDate),
+              }
+
+              uniqueArray.push(toAdd);
+            });
+            this.bookingSource = uniqueArray.filter((obj: { title: any; }, index: any, self: any[]) =>
+              index === self.findIndex((t) => (
+                  t.title === obj.title
+              ))
+            );
+          },
+          error: (err: ErrorEvent) => {
+            this.isLoading = false;
+            this.toasterService.displayErrorToast(err.error.status);
+          },
+          complete: () => {
+            return;
+          }
+        });
+      } else {
+        this.bookingService.bookingsNative().pipe(takeUntil(this.destroy$)).subscribe({
+          next: (response) => {
+            console.log(response.data.data);
+            this.isLoading = false;
+            if (response.data.status === 'OK') {
+              this.tempBookingSource = response.data.data;
+              response.data.data.map((item: any, index: string | number) => {
+                let startTime = new Date(response.data.data[index].start_time);
+                let futureDate:any = new Date(startTime);
+                futureDate.setMinutes(startTime.getMinutes() + response.data.data[index].duration);
+                futureDate = format(futureDate, "yyyy-MM-dd'T'HH:mm:ss");
+                if (response.data.data[index].patient_uid !== null) {
+                  patientObject = this.patientList.find((obj: { [x: string]: any; }) => obj['uid'] === response.data.data[index].patient_uid);
+                  patient = patientObject.name;  
+                }
+                const toAdd: CalBooking = {
+                  title: patient + ' - ' + response.data.data[index].reason,
+                  allDay: false,
+                  startTime: new Date(response.data.data[index].start_time),
+                  endTime: new Date(futureDate),
+                }
+  
+                uniqueArray.push(toAdd);
+              });
+              this.bookingSource = uniqueArray;
+            } else {
+              this.toasterService.displayErrorToast(response.data.status);
+            }
+          },
+          error: (err: ErrorEvent) => {
+            this.isLoading = false;
+            this.toasterService.displayErrorToast(err.error.status);
+          },
+          complete: () => {
+            return;
+          }
+        });
+      }
+  }
+
   onTimeSelected(ev: {selectedTime: Date; events: any[]}){
     this.formattedStart = format(ev.selectedTime, 'HH:mm, MMM d, yyyy'); // format booking start time
     this.newBooking.startTime = format(ev.selectedTime, "yyyy-MM-dd'T'HH:mm:ss"); // add start date to new booking
@@ -333,11 +327,15 @@ export class DashboardPage implements OnInit, OnDestroy {
   }
 
   onBookingSelected(ev:any) {
+    console.log(ev);
     this.updateEvent = true;
     const hyphenIndex = ev.title.indexOf(' - ');
     const title = hyphenIndex !== -1 ? ev.title.substring(hyphenIndex + 3) : ev.title
 
     const foundObject = this.tempBookingSource.find((obj: { reason: number; }) => obj.reason === title);
+    console.log(foundObject.duration);
+
+    const foundObject2 = this.tempBookingSource.find((obj: { reason: number; }) => obj.reason === title);
     this.selectedDuration = foundObject.duration;
 
     this.selectedPatient = this.patientList.find((obj: { uid: number; }) => obj.uid === foundObject.patient_uid);
@@ -407,40 +405,121 @@ export class DashboardPage implements OnInit, OnDestroy {
     // SAVE BOOKING
     let uniqueArray: CalBooking[] = [];
     let patient: any = '';
+  //  console.log(this.bookingForm.value);
     const duration = this.calculateDuration(this.newBooking.startTime, this.newBooking.endTime);
+   // console.log(duration);
     this.bookingForm.patchValue({duration : duration, start_time: this.newBooking.startTime });
     this.updateEvent = true;
+    this.newBooking.start_time = new Date(this.newBooking.startTime);
+    this.newBooking.duration = duration;
+    this.newBooking.booking_status_uid = this.bookingForm.get('booking_status_uid')?.value;
+    this.newBooking.booking_type_uid = this.bookingForm.get('booking_type_uid')?.value;
+    this.newBooking.patient_uid = this.bookingForm.get('patient_uid')?.value;
+    this.newBooking.reason = this.bookingForm.get('reason')?.value;
+    delete this.newBooking['startTime'];
+    delete this.newBooking['endTime'];
+    delete this.newBooking['allDay'];
+    delete this.newBooking['title'];
+    console.log(this.newBooking);
     if (this.bookingForm.valid) { // VALID FORM VALUES
-      this.bookingService.makeBookingWeb(this.newBooking).pipe(takeUntil(this.destroy$)).subscribe({
-        next: (response) => {
-          this.isLoading = false;
-          this.toasterService.displaySuccessToast('Successfull booked');
-          let startTime = new Date(response.data.start_time);
-          let futureDate:any = new Date(startTime);
-          futureDate.setMinutes(startTime.getMinutes() + response.data.duration);
-          futureDate = format(futureDate, "yyyy-MM-dd'T'HH:mm:ss");
-
-          const toAdd: CalBooking = {
-            title: patient + ' - ' + response.data.reason,
-            allDay: false,
-            startTime: new Date(response.data.start_time),
-            endTime: new Date(futureDate),
+      if (Capacitor.getPlatform() === 'web') {
+        this.bookingService.makeBookingWeb(this.newBooking).pipe(takeUntil(this.destroy$)).subscribe({
+          next: (response) => {
+            this.isLoading = false;
+            this.toasterService.displaySuccessToast('Successfull booked');
+            let startTime = new Date(response.data.start_time);
+            let futureDate:any = new Date(startTime);
+            futureDate.setMinutes(startTime.getMinutes() + response.data.duration);
+            futureDate = format(futureDate, "yyyy-MM-dd'T'HH:mm:ss");
+  
+            this.newBooking = {
+              title: '',
+              allDay: false,
+              startTime: null,
+              endTime: null,
+              entity_uid: 4,
+              diary_uid: 4,
+              booking_type_uid: null,
+              booking_status_uid: null,
+              start_time: null,
+              duration: null,
+              patient_uid: null,
+              reason: null,
+              cancelled: false
+            }
+  
+            const toAdd: CalBooking = {
+              title: patient + ' - ' + response.data.reason,
+              allDay: false,
+              startTime: new Date(response.data.start_time),
+              endTime: new Date(futureDate),
+            }
+  
+            uniqueArray.push(toAdd);
+            this.bookingSource.push(toAdd);
+            this.myCal.loadEvents();
+            this.getBookings();
+          },
+          error: (err: ErrorEvent) => {
+            this.isLoading = false;
+            this.toasterService.displayErrorToast(err.error.status);
+          },
+          complete: () => {
+            this.isLoading = false;
+            this.modal.dismiss()
+            return;
           }
+        });
+      } else {
+        this.bookingService.makeBookingNative(this.newBooking).pipe(takeUntil(this.destroy$)).subscribe({
+          next: (response) => {
+            this.isLoading = false;
+            this.toasterService.displaySuccessToast('Successfull booked');
+            let startTime = new Date(response.data.data.start_time);
+            let futureDate:any = new Date(startTime);
+            futureDate.setMinutes(startTime.getMinutes() + response.data.data.duration);
+            futureDate = format(futureDate, "yyyy-MM-dd'T'HH:mm:ss");
+  
+            this.newBooking = {
+              title: '',
+              allDay: false,
+              startTime: null,
+              endTime: null,
+              entity_uid: 4,
+              diary_uid: 4,
+              booking_type_uid: null,
+              booking_status_uid: null,
+              start_time: null,
+              duration: null,
+              patient_uid: null,
+              reason: null,
+              cancelled: false
+            }
+  
+            const toAdd: CalBooking = {
+              title: patient + ' - ' + response.data.data.reason,
+              allDay: false,
+              startTime: new Date(response.data.data.start_time),
+              endTime: new Date(futureDate),
+            }
+  
+            uniqueArray.push(toAdd);
+            this.bookingSource.push(toAdd);
+            this.myCal.loadEvents();
+            this.getBookings();
+          },
+          error: (err: ErrorEvent) => {
+            this.isLoading = false;
+            this.toasterService.displayErrorToast(err.error.status);
+          },
+          complete: () => {
+            this.isLoading = false;
+            this.modal.dismiss()
+            return;
+          }
+        });
+      }
 
-          uniqueArray.push(toAdd);
-          this.bookingSource.push(toAdd);
-          this.myCal.loadEvents();
-        },
-        error: (err: ErrorEvent) => {
-          this.isLoading = false;
-          this.toasterService.displayErrorToast(err.error.status);
-        },
-        complete: () => {
-          this.isLoading = false;
-          this.modal.dismiss()
-          return;
-        }
-      });
     } else {
       this.toasterService.displayErrorToast('Fill in all required fields');
     }
@@ -499,4 +578,3 @@ export class DashboardPage implements OnInit, OnDestroy {
   }
 
 }
-

@@ -23,7 +23,7 @@ export class BookingsService {
   }
 
   public bookingsNative = (): Observable<any> => {
-    const url = environment.urlNative + 'patient?fields=["entity_uid","id","debtor_uid","name","surname","initials","title","date_of_birth","mobile_no","gender","benefit_check"]';
+    const url = environment.urlNative + 'booking?fields=["entity_uid","diary_uid","booking_type_uid","booking_status_uid","patient_uid","start_time","duration","treating_doctor_uid","reason","invoice_nr","cancelled","debtor","location_uid","meta_data","updated_at"]';
     const options: HttpOptions = {
       headers: {
         'Content-Type': 'application/json',

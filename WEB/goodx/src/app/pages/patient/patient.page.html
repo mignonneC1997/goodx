@@ -1,42 +1,158 @@
 <ion-header>
-  <ion-toolbar>
-    <ion-buttons slot="start">
-      <ion-button (click)="dashboard()">
-        <ion-icon slot="icon-only" name="calendar"></ion-icon>
-      </ion-button>
-    </ion-buttons>
-    <ion-title class="ion-text-center">Patients</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="logout()">
-        <ion-icon slot="icon-only" name="log-out"></ion-icon>
-      </ion-button>
-    </ion-buttons>
+  <ion-toolbar color="credicoblue" align="center">
+      <ion-title class="ion-text-center" *ngIf="!seachbar">Patients</ion-title> 
+          <ion-buttons *ngIf="!seachbar" slot="start">
+              <ion-button (click)="showSearch()">
+                  <ion-icon name="search-outline" color="dark"></ion-icon>
+              </ion-button>
+          </ion-buttons>
+          <ion-buttons slot="end">
+            <ion-button (click)="dashboard()">
+              <ion-icon slot="icon-only" name="calendar" color="dark"></ion-icon>
+            </ion-button>
+          </ion-buttons>
+          <ion-searchbar *ngIf="seachbar" mode="md" showCancelButton="never" [(ngModel)]="searchstring" (input)="searchuser($event)" placeholder="Search User..."></ion-searchbar>
   </ion-toolbar>
 </ion-header>
+<ion-content>
 
-<ion-content [fullscreen]="true">
-  <ion-list>
-    <ion-item *ngFor="let user of users" class="user-item">
-      <ion-avatar slot="start">
-        <!-- Display different avatar images based on user's gender -->
-        <ng-container *ngIf="user.gender === 'male'">
-          <img src="../../../assets/images/male.png" alt="Male Avatar">
-        </ng-container>
-        <ng-container *ngIf="user.gender === 'female'">
-          <img src="../../../assets/images/male.png" alt="Female Avatar">
-        </ng-container>
-      </ion-avatar>
-      <ion-label>
-        <h2>{{ user.name }} {{ user.surname }}</h2>
-        <p class="user-info">Title: {{ user.title }}</p>
-        <p class="user-info">Date of Birth: {{ user.date_of_birth }}</p>
-        <p class="user-info">Mobile No: {{ user.mobile_no }}</p>
-        <!-- Add more user details here as needed -->
-      </ion-label>
-    </ion-item>
-  </ion-list>
+  <ion-card *ngFor="let key of users; let i = index" class="my-2" (click)="viewProfile(key)" mode="ios">
+    <ion-grid>
+      <ion-row class="usersList mx-0 my-0">
+        <ion-col size="2">
+          <ion-thumbnail item-left class="thumbnail-container">
+            <img class="profileImages" *ngIf="key.gender === 'male'" src="../../../assets/images/male.png" alt="Male Avatar">
+            <img class="profileImages" *ngIf="key.gender === 'female'" src="../../../assets/images/female.png" alt="Female Avatar">
+          </ion-thumbnail>
+        </ion-col>
+        <ion-col>
+          <ion-row>
+            <h4>{{key.name}} {{key.surname}}</h4>
+          </ion-row>
+        </ion-col>
+      </ion-row>
+    </ion-grid>
+  </ion-card>
 
-  <!-- LOADING SPINNER -->
+  <ion-modal #patientModal [presentingElement]="presentingElement">
+    <ng-template>
+      <ion-header>
+        <ion-toolbar>
+          <ion-title class="ion-text-center">User Details</ion-title>
+          <ion-buttons slot="end">
+            <ion-button (click)="patientModal.dismiss()" >X
+            </ion-button>
+          </ion-buttons>
+        </ion-toolbar>
+      </ion-header>
+      
+      <ion-content>
+        <div class="container py-2 px-2">
+          <div>
+            <ion-col size-lg="4">
+              <ion-card class="cstUserCard">
+                <div class="text-center p-2">
+                  <div class="imgContainer">
+                    <img class="img-fluid profileImg" [src]="selectedPatient.gender === 'male' ? 'assets/images/male.png' : 'assets/images/female.png'" alt="User Avatar">
+                  </div>        
+                  <h5 class="my-3 pt-3">{{ selectedPatient.title }} - {{ selectedPatient.name }} {{ selectedPatient.surname }}</h5>
+                </div>
+              </ion-card>
+            </ion-col>
+            <ion-col size-lg="8">
+              <ion-card class="mb-2 mt-0 cstUserCard">
+                <div class="p-2">
+                  <ion-row>
+                    <ion-col class="sm-3">
+                      <p class="mb-0">Full Name</p>
+                    </ion-col>
+                    <ion-col class="sm-9">
+                      <p class="text-muted mb-0">{{ selectedPatient.name }} {{ selectedPatient.surname }}</p>
+                    </ion-col>
+                  </ion-row>
+                  <hr>
+                  <ion-row>
+                    <ion-col class="sm-3">
+                      <p class="mb-0">Email</p>
+                    </ion-col>
+                    <ion-col class="sm-9">
+                      <p class="text-muted mb-0">{{ selectedPatient.email }}</p>
+                    </ion-col>
+                  </ion-row>
+                  <hr>
+                  <ion-row>
+                    <ion-col class="sm-3">
+                      <p class="mb-0">Mobile</p>
+                    </ion-col>
+                    <ion-col class="sm-9">
+                      <p class="text-muted mb-0">{{ selectedPatient.mobile_no }}</p>
+                    </ion-col>
+                  </ion-row>
+                  <hr>
+                  <ion-row>
+                    <ion-col class="sm-3">
+                      <p class="mb-0">ID Number</p>
+                    </ion-col>
+                    <ion-col class="sm-9">
+                      <p class="text-muted mb-0">{{ selectedPatient.id_no }}</p>
+                    </ion-col>
+                  </ion-row>
+                  <ion-row>
+                    <ion-col class="sm-3">
+                      <p class="mb-0">Date of Birth</p>
+                    </ion-col>
+                    <ion-col class="sm-9">
+                      <p class="text-muted mb-0">{{ selectedPatient.date_of_birth }}</p>
+                    </ion-col>
+                  </ion-row>
+                  <ion-row>
+                    <ion-col class="sm-3">
+                      <p class="mb-0">File Number</p>
+                    </ion-col>
+                    <ion-col class="sm-9">
+                      <p class="text-muted mb-0">{{ selectedPatient.file_no }}</p>
+                    </ion-col>
+                  </ion-row>
+                  <ion-row>
+                    <ion-col class="sm-3">
+                      <p class="mb-0">Dependant Number</p>
+                    </ion-col>
+                    <ion-col class="sm-9">
+                      <p class="text-muted mb-0">{{ selectedPatient.dependant_no }}</p>
+                    </ion-col>
+                  </ion-row>
+                  <ion-row>
+                    <ion-col class="sm-3">
+                      <p class="mb-0">Dependant Type</p>
+                    </ion-col>
+                    <ion-col class="sm-9">
+                      <p class="text-muted mb-0">{{ selectedPatient.dependant_type }}</p>
+                    </ion-col>
+                  </ion-row>
+                  <ion-row>
+                    <ion-col class="sm-3">
+                      <p class="mb-0">Account Identifier</p>
+                    </ion-col>
+                    <ion-col class="sm-9">
+                      <p class="text-muted mb-0">{{ selectedPatient.acc_identifier }}</p>
+                    </ion-col>
+                  </ion-row>
+                  <ion-row>
+                    <ion-col class="sm-3">
+                      <p class="mb-0">Private</p>
+                    </ion-col>
+                    <ion-col class="sm-9">
+                      <p class="text-muted mb-0">{{ selectedPatient.private }}</p>
+                    </ion-col>
+                  </ion-row>
+                </div>
+              </ion-card>
+            </ion-col>
+          </div>
+        </div>
+      </ion-content>      
+    </ng-template>
+  </ion-modal>
   <div class="loading-overlay" *ngIf="isLoading">
     <ion-spinner></ion-spinner>
   </div>

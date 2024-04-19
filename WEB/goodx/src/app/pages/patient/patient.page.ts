@@ -1,8 +1,8 @@
 /* eslint-disable @angular-eslint/no-empty-lifecycle-method */
-import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { Capacitor } from '@capacitor/core';
-import { LoadingController } from '@ionic/angular';
+import { IonModal, IonRouterOutlet, LoadingController } from '@ionic/angular';
 import { ReplaySubject, takeUntil } from 'rxjs';
 import { PatientsService } from '../../services/patients.service';
 import { StorageService } from '../../services/storage.service';
@@ -30,18 +30,31 @@ interface User {
 })
 
 export class PatientPage implements OnInit, OnDestroy {
+  presentingElement:any = null;
   public isLoading: boolean = false;
+  public showViewButton = false;
   public users!: User[];
+  public temparray: any;
+  public searchstring: any;
+  public seachbar = false;
+  public selectedPatient:any;
+  @ViewChild('patientModal') patientModal!: IonModal;
   private destroy$: ReplaySubject<boolean> = new ReplaySubject(1);
 
-  constructor(private patientsApi: PatientsService, private toasterService: ToastmessageService,
-    private storageS: StorageService, private router: Router, private loadingCtrl: LoadingController) { }
+  constructor(private patientsApi: PatientsService, private toasterService: ToastmessageService, private el: ElementRef,
+    private storageS: StorageService, private router: Router, private loadingCtrl: LoadingController, private ionRouterOutlet: IonRouterOutlet) {
+      this.presentingElement = ionRouterOutlet.nativeEl;
+    }
 
   ngOnInit() {
   }
 
   ionViewDidEnter() {
     this.getPatients();
+  }
+
+  openAddModal() {
+    this.patientModal.present();
   }
 
   getPatients() {
@@ -52,6 +65,7 @@ export class PatientPage implements OnInit, OnDestroy {
         next: (response) => {
           this.isLoading = false;
           this.users = response.data;
+          this.temparray = response.data;
         },
         error: (err: ErrorEvent) => {
           this.isLoading = false;
@@ -68,6 +82,7 @@ export class PatientPage implements OnInit, OnDestroy {
           if (response.data.status === 'OK') {
             console.log(response.data.data);
             this.users = response.data.data;
+            this.temparray = response.data.data;
           } else {
             this.toasterService.displayErrorToast(response.data.status);
           }
@@ -83,7 +98,6 @@ export class PatientPage implements OnInit, OnDestroy {
     }
   }
 
-
   logout() {
     this.storageS.clearData();
     localStorage.clear();
@@ -91,12 +105,38 @@ export class PatientPage implements OnInit, OnDestroy {
   }
 
   dashboard() {
-    this.router.navigate(['/dashboard']);
+    this.router.navigate(['/bookings']);
+  }
+
+  public viewProfile = (key: any) => {
+    this.selectedPatient = key;
+    this.openAddModal();
+  }
+
+  searchuser(ev: any) {
+    this.users = this.temparray;
+    const user =  ev.target.value;
+    if (user.trim() === '') {
+      return;
+    }
+
+    this.users = this.temparray.filter((v: { name: string; }) => {
+      if ((v.name.toLowerCase().indexOf(user.toLowerCase())) > -1) {
+        return true;
+      }
+      return false;
+    })
+  }  
+
+  public showSearch = () => {
+    this.seachbar = true;
   }
 
   ngOnDestroy() {
     // Unsubscribe to prevent memory leaks
     this.users = [];
+    this.presentingElement = null;
+    this.temparray = [];
     this.isLoading = false;
     this.destroy$.next(true);
     this.destroy$.complete();
