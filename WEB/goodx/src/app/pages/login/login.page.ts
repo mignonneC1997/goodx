@@ -7,6 +7,7 @@ import { ReplaySubject, takeUntil } from 'rxjs';
 
 import { LoginService } from '../../services/login.service';
 import {  ToastmessageService } from '../../services/toaster.service';
+import { timeout } from '../../../../config';
 
 @Component({
   selector: 'app-login',
@@ -17,7 +18,7 @@ export class LoginPage implements OnInit, OnDestroy {
   public loginForm!: FormGroup;
   public loginData = {
     "model": {
-      "timeout": 259200
+      "timeout": timeout
     },
     "auth": [
       [
@@ -50,7 +51,7 @@ export class LoginPage implements OnInit, OnDestroy {
     this.isLoading = true;
     this.loginData = {
       "model": {
-        "timeout": 259200
+        "timeout": timeout
       },
       "auth": [
         [
@@ -111,7 +112,7 @@ export class LoginPage implements OnInit, OnDestroy {
     // Unsubscribe to prevent memory leaks
     this.loginData = {
       "model": {
-        "timeout": 259200
+        "timeout": timeout
       },
       "auth": [
         [
@@ -123,6 +124,7 @@ export class LoginPage implements OnInit, OnDestroy {
         ]
       ]
     };
+    this.loginForm.reset();
     this.isLoading = false;
     this.destroy$.next(true);
     this.destroy$.complete();
