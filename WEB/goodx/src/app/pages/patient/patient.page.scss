@@ -48,7 +48,7 @@ ion-spinner {
 }
 
 ion-searchbar{
-    --icon-color: white;
+    --icon-color: var(--ion-color-dark)!important;
     background-color: transparent;
     border: 0px;
     ::ng-deep{
@@ -60,7 +60,7 @@ ion-searchbar{
                 //any style that you want to implement on your searchbar
             }
             ::placeholder {
-                color: white;
+                color: var(--ion-color-dark)!important;
             }
         }
     }

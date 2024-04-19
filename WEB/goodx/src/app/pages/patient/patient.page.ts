@@ -119,7 +119,7 @@ export class PatientPage implements OnInit, OnDestroy {
       return;
     }
 
-    this.users = this.temparray.filter((v: { name: string; }) => {
+    this.users = this.users.filter((v: { name: string; }) => {
       if ((v.name.toLowerCase().indexOf(user.toLowerCase())) > -1) {
         return true;
       }
@@ -129,6 +129,12 @@ export class PatientPage implements OnInit, OnDestroy {
 
   public showSearch = () => {
     this.seachbar = true;
+  }
+
+  public back = () => {
+    this.searchstring = '';
+    this.seachbar = false;
+    this.users = this.temparray;
   }
 
   ngOnDestroy() {

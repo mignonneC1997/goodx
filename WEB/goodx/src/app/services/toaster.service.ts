@@ -36,7 +36,7 @@ export class ToastmessageService {
     const toast = await this.toast.create({
       message: resp,
       duration: 5000,
-      color: 'credicoblue',
+      color: 'primary',
       position: 'top'
     });
     toast.present();

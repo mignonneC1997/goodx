@@ -6,6 +6,11 @@
                   <ion-icon name="search-outline" color="dark"></ion-icon>
               </ion-button>
           </ion-buttons>
+          <ion-buttons *ngIf="seachbar" slot="start">
+              <ion-button (click)="back()">
+                  <ion-icon name="arrow-back-outline" color="dark"></ion-icon>
+              </ion-button>
+          </ion-buttons>
           <ion-buttons slot="end">
             <ion-button (click)="dashboard()">
               <ion-icon slot="icon-only" name="calendar" color="dark"></ion-icon>
@@ -14,9 +19,8 @@
           <ion-searchbar *ngIf="seachbar" mode="md" showCancelButton="never" [(ngModel)]="searchstring" (input)="searchuser($event)" placeholder="Search User..."></ion-searchbar>
   </ion-toolbar>
 </ion-header>
-<ion-content>
-
-  <ion-card *ngFor="let key of users; let i = index" class="my-2" (click)="viewProfile(key)" mode="ios">
+<ion-content mode="ios">
+  <ion-card *ngFor="let key of users; let i = index" class="my-2" (click)="viewProfile(key)">
     <ion-grid>
       <ion-row class="usersList mx-0 my-0">
         <ion-col size="2">

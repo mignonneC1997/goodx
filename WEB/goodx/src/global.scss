@@ -80,3 +80,13 @@
         }
     }
 }
+
+ion-searchbar ion-icon {
+    right: 16px !important;
+    left: auto !important;
+    transform: scale(1.5);
+}
+
+.searchbar-clear-icon {
+    display: none !important;
+}
