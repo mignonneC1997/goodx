@@ -53,11 +53,11 @@ export class PatientPage implements OnInit, OnDestroy {
     this.getPatients();
   }
 
-  openAddModal() {
+  public openAddModal = () => {
     this.patientModal.present();
   }
 
-  getPatients() {
+  public getPatients = () => {
     this.users = [];
     this.isLoading = true;
     if (Capacitor.getPlatform() === 'web') {
@@ -97,13 +97,13 @@ export class PatientPage implements OnInit, OnDestroy {
     }
   }
 
-  logout() {
+  public logout = () => {
     this.storageS.clearData();
     localStorage.clear();
     this.router.navigate(['/login']);
   }
 
-  dashboard() {
+  public dashboard= () => {
     this.router.navigate(['/bookings']);
   }
 
@@ -112,7 +112,7 @@ export class PatientPage implements OnInit, OnDestroy {
     this.openAddModal();
   }
 
-  searchuser(ev: any) {
+  public searchuser = (ev:any) => {
     this.users = this.temparray;
     const user =  ev.target.value;
     if (user.trim() === '') {
