@@ -1,7 +1,6 @@
 import { Component } from '@angular/core';
 import { BookingsService } from './services/bookings.service';
 import { StorageService } from './services/storage.service';
-
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',

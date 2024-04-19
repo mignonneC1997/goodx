@@ -36,7 +36,7 @@ export class ToastmessageService {
     const toast = await this.toast.create({
       message: resp,
       duration: 5000,
-      color: 'credicoblue',
+      color: 'primary',
       position: 'top'
     });
     toast.present();
@@ -50,5 +50,36 @@ export class ToastmessageService {
       position: 'top'
     });
     toast.present();
+  }
+
+  async confirmBookingPrompt(msg:any) {
+    let response = false;
+    const alert = await this.alertController.create({
+    header: 'Booking',
+      message: msg,
+      backdropDismiss: false,
+      cssClass: 'bookingPrompt',
+      buttons: [
+        {
+          text: 'Yes',
+          handler: () => {
+            response = true;
+            alert.dismiss(true);
+          }
+        },
+        {
+          text: 'No',
+          handler: () => {
+            response = false;
+            alert.dismiss(true);
+          }
+        }
+      ],
+    });
+    await alert.present();
+    await alert.onDidDismiss().then((data) => {
+      data.data = response;
+    });
+    return response;
   }
 }

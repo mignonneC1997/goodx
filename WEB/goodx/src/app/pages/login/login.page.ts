@@ -4,8 +4,8 @@ import { Router } from '@angular/router';
 import { Capacitor } from '@capacitor/core';
 import { LoadingController } from '@ionic/angular';
 import { ReplaySubject, takeUntil } from 'rxjs';
-import { LoginService } from 'src/app/services/login.service';
-import {  ToastmessageService } from 'src/app/services/toaster.service';
+import { LoginService } from '../../services/login.service';
+import {  ToastmessageService } from '../../services/toaster.service';
 import { StorageService } from '../../services/storage.service';
 
 @Component({
@@ -36,6 +36,10 @@ export class LoginPage implements OnInit, OnDestroy {
     private storageS: StorageService, private loadingCtrl: LoadingController) {}
 
   ngOnInit() {
+    this.buildForm();
+  }
+
+  buildForm() {
     this.loginForm = this.formBuilder.group({
       username: ['', Validators.required],
       password: ['', Validators.required],
@@ -63,11 +67,10 @@ export class LoginPage implements OnInit, OnDestroy {
         this.loginApi.loginWeb(this.loginData).pipe(takeUntil(this.destroy$)).subscribe({
           next: (response) => {
             this.isLoading = false;
-            console.log(response.data.uid);
             this.saveToken(response.data.uid);
             localStorage.setItem('userToken', response.data.uid);
             this.toasterService.displaySuccessToast('successfully logged in');
-            this.router.navigate(['/dashboard']);
+            this.router.navigate(['/bookings']);
           },
           error: (err: ErrorEvent) => {
             this.isLoading = false;
@@ -83,10 +86,9 @@ export class LoginPage implements OnInit, OnDestroy {
           next: (response) => { 
             this.isLoading = false; 
             if (response.data.status === 'OK') {
-              console.log(response.data.data.uid);
               this.saveToken(response.data.data.uid);
               this.toasterService.displaySuccessToast('successfully logged in');
-              this.router.navigate(['/dashboard']);
+              this.router.navigate(['/bookings']);
             } else {
               this.toasterService.displayErrorToast(response.data.status);
             }

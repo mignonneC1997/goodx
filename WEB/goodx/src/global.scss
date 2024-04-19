@@ -28,6 +28,9 @@
 @import 'swiper/scss';
 @import '@ionic/angular/css/ionic-swiper';
 
+@import 'swiper/swiper-bundle.css';
+@import 'swiper/swiper-bundle.min.css';
+
 .calendar-event {
     width: 100% !important;
 }
@@ -41,4 +44,49 @@
 .monthview-selected {
     background-color: var(--ion-color-primary)!important;
     color: #fff !important;
+}
+
+.bookingPrompt{
+    .alert-wrapper {
+        background-color: white;
+        .alert-head {
+            text-align: center;
+            .alert-title {
+                color: var(--ion-color-dark) !important;
+                font-size: 20px;
+                font-weight: 700;
+            }
+        }
+        .alert-message {
+            text-align: left;
+            color: var(--ion-color-medium) !important;
+            font-size: medium;
+            text-align: center;
+        }
+        .alert-message ul {
+            padding-inline-start: 24px;
+            line-height: 1.5em;
+            list-style-type: circle;
+        }
+
+        .alert-button-group {
+            justify-content: center; /* Make buttons fill the available space */
+        }
+
+        .alert-button {
+            color: var(--ion-color-primary) !important;
+            display: flex !important;
+            justify-content: space-between !important;
+        }
+    }
+}
+
+ion-searchbar ion-icon {
+    right: 16px !important;
+    left: auto !important;
+    transform: scale(1.5);
+}
+
+.searchbar-clear-icon {
+    display: none !important;
 }

@@ -9,7 +9,16 @@ export interface CalBooking {
   title: string,
   allDay: boolean,
   startTime: Date,
-  endTime: Date
+  endTime: Date,
+  uid: number,
+  reason: string,
+  entity_uid: number, 
+  start_time: string,
+  patient_uid: number,
+  booking_status_uid: number,
+  booking_type_uid: number
+  diary_uid: number,
+  duration: number
 }
 
 @Injectable({
@@ -31,7 +40,6 @@ export class StorageService {
   // set a key/value
   async setToken(key: string, value: any): Promise<any> {
     const rst = await this.encryptToken(value);
-    console.log(rst);
     if (rst !== undefined) {
       return rst;
     }

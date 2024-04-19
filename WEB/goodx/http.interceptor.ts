@@ -16,10 +16,8 @@ constructor(private authService: StorageService) {}
         }).catch(err =>{})
 
         const token = localStorage.getItem('userToken');
-        console.log('neee tokn oauth token == ', token);
 
         // Clone the request and add the token to the Authorization header
-        console.log('auth token == ', this.authToken);
         if (token) {
             request = request.clone({
                 setHeaders: {

@@ -1,3 +1,13 @@
+ion-card {
+    margin-left: 0;
+    margin-right: 0;
+    text-align: center;
+}
+
+.cstUserCard {
+    margin: 0 1em;
+}
+
 .modal {
     --background: var(--ion-color-light)!important
 }
@@ -54,4 +64,33 @@ ion-input.ng-invalid.ng-touched  {
 
 ion-select.ng-invalid.ng-touched {
     border: solid 2px red;
+}
+
+.addImgBtn {
+    position: relative;
+    left: 3em;
+    top: -3em;
+}
+
+.profileImg {
+    max-height: 15em;
+    clip-path: circle();
+}
+
+.imgContainer {
+    max-height: 15em;
+    padding-top: 1em;
+}
+
+@supports (-webkit-touch-callout: none) {
+    /* iOS devices */ 
+    .profileImg {
+        max-height: 18em;
+        clip-path: circle();
+    }
+    
+    .imgContainer {
+        max-height: 18em;
+        padding-top: 1em;
+    }
 }
