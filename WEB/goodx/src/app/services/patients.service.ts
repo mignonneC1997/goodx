@@ -7,7 +7,7 @@ import { catchError, map, timeout } from 'rxjs/operators';
 
 import { environment } from '../../../src/environments/environment';
 import { HttpHeaderService } from './http-headers.service';
-import { responsetimeout } from '../../../config';
+import { responseTimeout } from '../../../config';
 
 @Injectable({
   providedIn: 'root'
@@ -18,7 +18,7 @@ export class PatientsService {
 
   public patientsWeb = (): Observable<any> => {
     return this.http.get<any>(environment.urlWeb + 'patient?fields=["entity_uid","id","debtor_uid","name","surname","initials","title","date_of_birth","mobile_no","gender","benefit_check","id_no","email","file_no","dependant_no","dependant_type","acc_identifier","private"]', { headers: this.httpHeaderService.getHTTPHeaders(), observe: 'response' }).pipe(
-      timeout(responsetimeout),
+      timeout(responseTimeout),
       map((response: HttpResponse<any>) => {
         return response.body;
       }), catchError((error: HttpErrorResponse) => {

@@ -8,7 +8,7 @@ import { Http, HttpOptions } from '@capacitor-community/http';
 
 import { environment } from '../../../src/environments/environment';
 import { HttpHeaderService } from './http-headers.service';
-import { responsetimeout } from '../../../config';
+import { responseTimeout } from '../../../config';
 
 @Injectable({
   providedIn: 'root'
@@ -19,7 +19,7 @@ export class AuthService {
 
   public loginWeb = (data:any): Observable<any> => {
       return this.http.post<any>(environment.urlWeb + 'session', data, { headers: this.httpHeaderService.getHTTPHeaders(), observe: 'response' }).pipe(
-        timeout(responsetimeout),
+        timeout(responseTimeout),
         map((response: HttpResponse<any>) => {
           return response.body;
         }), catchError((error: HttpErrorResponse) => {
