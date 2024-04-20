@@ -3,17 +3,17 @@
       <ion-title class="ion-text-center" *ngIf="!seachbar">Patients</ion-title> 
           <ion-buttons *ngIf="!seachbar" slot="start">
               <ion-button (click)="showSearch()">
-                  <ion-icon name="search-outline" color="dark"></ion-icon>
+                  <ion-icon name="search-outline" color="primary"></ion-icon>
               </ion-button>
           </ion-buttons>
           <ion-buttons *ngIf="seachbar" slot="start">
               <ion-button (click)="back()">
-                  <ion-icon name="arrow-back-outline" color="dark"></ion-icon>
+                  <ion-icon name="arrow-back-outline" color="primary"></ion-icon>
               </ion-button>
           </ion-buttons>
           <ion-buttons slot="end">
             <ion-button (click)="dashboard()">
-              <ion-icon slot="icon-only" name="calendar" color="dark"></ion-icon>
+              <ion-icon slot="icon-only" name="calendar" color="primary"></ion-icon>
             </ion-button>
           </ion-buttons>
           <ion-searchbar *ngIf="seachbar" mode="md" showCancelButton="never" [(ngModel)]="searchstring" (input)="searchuser($event)" placeholder="Search User..."></ion-searchbar>
@@ -40,8 +40,8 @@
     </ion-grid>
   </ion-card>
 
-  <!-- PATIENT PROFILE -->
-  <ion-modal #patientModal [presentingElement]="presentingElement">
+   <!-- PATIENT PROFILE -->
+   <ion-modal #patientModal [presentingElement]="presentingElement">
     <ng-template>
       <ion-header>
         <ion-toolbar>
@@ -52,6 +52,7 @@
           </ion-buttons>
         </ion-toolbar>
       </ion-header>
+      
       <ion-content>
         <div class="container py-2 px-2">
           <div>

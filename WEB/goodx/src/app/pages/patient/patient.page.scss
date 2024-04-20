@@ -52,8 +52,6 @@ ion-searchbar{
 ion-icon {
     right: 16px !important;
     left: auto !important;
-    transform: scale(1.5);
-    color: white;
 }
 
 .usersList {
@@ -62,18 +60,12 @@ ion-icon {
     margin: 0.5em;
 }
 
-.profileImages{
-    clip-path: circle();
+h5 {
+    color: var(--ion-color-primary)!important;
 }
 
-p {
-    margin-top: 0;
-    margin-bottom: 0;
-    color: #909192;
-    width: 20ch;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
+.profileImages{
+    clip-path: circle();
 }
 
 ion-thumbnail {
@@ -86,12 +78,59 @@ ion-thumbnail {
     height: 50px;
 }
 
+.modal {
+    --background: var(--ion-color-light)!important
+}
+
+ion-card {
+    text-align: center;
+}
+
 .cstUserCard {
     margin: 0 1em;
 }
 
-.modal {
-    --background: var(--ion-color-light)!important
+.group {
+background: #fff;
+border-radius: 10px;
+padding: 2px 8px 2px 8px;
+margin-bottom: 20px;
+}
+
+.indicator-container {
+    padding-right: 0.4rem;
+    padding-left: 0.4rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+}
+
+.booking-indicator {
+    color: #00a65a;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+}
+
+.errorSpan {
+    color: red;
+    font-weight: 600;
+    text-shadow: 0px 1px rgba(34, 23, 23, 0.597);
+}
+
+ion-input.ng-invalid.ng-touched  {
+    border: solid 2px red;
+}
+
+ion-select.ng-invalid.ng-touched {
+    border: solid 2px red;
+}
+
+.addImgBtn {
+    position: relative;
+    left: 3em;
+    top: -3em;
 }
 
 .profileImg {
@@ -115,8 +154,4 @@ ion-thumbnail {
         max-height: 18em;
         padding-top: 1em;
     }
-}
-
-ion-card {
-    text-align: center;
 }

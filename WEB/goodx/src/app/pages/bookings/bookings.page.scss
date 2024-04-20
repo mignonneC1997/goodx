@@ -11,6 +11,11 @@ ion-card {
 .modal {
     --background: var(--ion-color-light)!important
 }
+
+h5 {
+    color: var(--ion-color-primary)!important;
+}
+
 .group {
 background: #fff;
 border-radius: 10px;
