@@ -1,11 +1,52 @@
-
 <ion-header>
-  <ion-toolbar>
-    <ion-title class="ion-text-center">Diary</ion-title>
+  <ion-toolbar color="light">
+    <ion-title class="ion-text-center">Dashboard</ion-title>
   </ion-toolbar>
 </ion-header>
 
-<ion-content>
-  <h1>dashboard</h1>
-  
+<ion-content class="dashboard-container">
+  <!-- Top part with profile image and user name -->
+  <div class="top-part">
+    <ion-avatar class="profile-pic">
+      <img src="../../../assets/images/male.png" alt="Profile Picture"> 
+    </ion-avatar>
+    <ion-label class="profile-name">{{user}}</ion-label>
+  </div>
+
+  <ion-card class="large-card">
+      <!-- BOOKINGS CARD -->
+    <ion-card-content class="bottom-part">
+      <ion-card class="dashboard-card" (click)="goToBookings()">
+        <ion-card-content class="ion-text-center">
+          <ion-grid>
+            <ion-row justify-content-center>
+              <ion-col size="6" class="center-content">
+                <ion-icon name="calendar"></ion-icon>
+                <h2>Bookings</h2>
+              </ion-col>
+              <ion-col size="6" class="ion-text-center bookingColumn">
+                <ion-label class="bookingAmount">{{bookingsCount}}</ion-label>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-card-content>
+      </ion-card>
+      <!-- PATIENTS CARD -->
+      <ion-card class="dashboard-card" (click)="goToPatients()">
+        <ion-card-content class="ion-text-center">
+          <ion-grid>
+            <ion-row justify-content-center>
+              <ion-col size="6" class="center-content">
+                <ion-icon name="person"></ion-icon>
+                <h2>Patients</h2>
+              </ion-col>
+              <ion-col size="6" class="ion-text-center patientsColumn">
+                <ion-label class="patientsAmount">{{patientsCount}}</ion-label>
+              </ion-col>
+            </ion-row>
+          </ion-grid>
+        </ion-card-content>
+      </ion-card>
+    </ion-card-content>
+  </ion-card>
 </ion-content>

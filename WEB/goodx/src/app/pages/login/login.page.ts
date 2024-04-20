@@ -68,18 +68,20 @@ export class LoginPage implements OnInit, OnDestroy {
       if (this.loginForm.valid) {
         loginApiCall.pipe(takeUntil(this.destroy$)).subscribe({
           next: (response) => {
+            console.log(response);
             this.isLoading = false;
             if (Capacitor.getPlatform() === 'web') {
               // SAVE UID TO LOCALSTORAGE
               localStorage.setItem('userToken', response.data.uid);
               this.toasterService.displaySuccessToast('successfully logged in');
-              this.router.navigate(['/bookings']);
+              localStorage.setItem('user', this.loginForm.get('username')?.value)
+              this.router.navigate(['/dashboard']);
             } else if (Capacitor.getPlatform() === 'ios' || Capacitor.getPlatform() === 'android') {
               if (response.data.status === 'OK') {
                 // SAVE UID TO LOCALSTORAGE
                 localStorage.setItem('userToken', response.data.data.uid);
                 this.toasterService.displaySuccessToast('successfully logged in');
-                this.router.navigate(['/bookings']);
+                this.router.navigate(['/dashboard']);
               } else {
                 this.toasterService.displayErrorToast(response.data.status);
               }

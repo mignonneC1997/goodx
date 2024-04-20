@@ -1,57 +1,91 @@
-.modal {
-    --background: var(--ion-color-light)!important
-}
-.group {
-background: #fff;
-border-radius: 10px;
-padding: 2px 8px 2px 8px;
-margin-bottom: 20px;
+.dashboard-container {
+    --background: #fff !important;
 }
 
-.indicator-container {
-    padding-right: 0.4rem;
-    padding-left: 0.4rem;
+.top-part {
     display: flex;
+    flex-direction: column;
     align-items: center;
-    justify-content: center;
-    gap: 2px;
+    padding: 20px;
+    height: 30vh;
 }
 
-.booking-indicator {
-    color: #00a65a;
-    width: 5px;
-    height: 5px;
-    border-radius: 50%;
+.large-card {
+    border: .2px solid var(--ion-color-medium)!important;
+    border-radius: 10px;
+    width: 100%; /* Three quarters of the page */
+    margin: 0px; /* Center the card horizontally */
+    height: 70vh;
+    --background: linear-gradient(var(--ion-color-medium), var(--ion-color-light)) !important;
 }
 
-.loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
+ion-card {
+    height: 10rem;
+}
+
+.profile-pic {
+    width: 120px;
+    height: 120px;
+}
+
+.profile-name {
+    margin-top: 10px;
+    --color: var(--ion-color-dark)!important;
+}
+
+h1 {
+    color: #fff;
+    margin-top: 2em;
+}
+
+h2 {
+    margin-top: 2em;
+    color: #fff;
+}
+
+.bottom-part {
+    display: flex;
+    flex-direction: column; /* Stack cards vertically */
+    align-items: center; /* Center cards horizontally */
+    padding: 20px; /* Add padding */
+}
+
+.dashboard-card {
+    width: 100%; /* Take up full width of the container */
+    margin: 10px 0; /* Add vertical margin between cards */
+    --background: linear-gradient(#0082c8, #1974a5) !important;
+}
+
+.center-content {
+    text-align: center;
     height: 100%;
-    background-color: rgba(204, 204, 204, 0.8);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
+    top: 2.5rem;
 }
 
-.loading-overlay ion-spinner {
-    --color: var(--ion-color-primary)!important;
-    transform:  scale(1.5);
+ion-card-content{
+    display: block;
 }
 
-.errorSpan {
-    color: red;
-    font-weight: 600;
-    text-shadow: 0px 1px rgba(34, 23, 23, 0.597);
+ion-icon {
+    color: #fff;
+    transform: scale(3);
+   // padding-left: .5em;
 }
 
-ion-input.ng-invalid.ng-touched  {
-    border: solid 2px red;
+.patientsAmount {
+    font-size: 50px;
+    color: #fff;
 }
 
-ion-select.ng-invalid.ng-touched {
-    border: solid 2px red;
+.patientsColumn {
+    margin-top: 1.5em;
+}
+
+.bookingAmount {
+    font-size: 50px;
+    color: #fff;
+}
+
+.bookingColumn {
+    margin-top: 1.5em;
 }
