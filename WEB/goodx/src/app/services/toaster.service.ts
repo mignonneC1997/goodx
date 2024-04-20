@@ -1,8 +1,8 @@
 import { Injectable,  } from '@angular/core';
-import { ToastController, AlertController, LoadingController, IonicSafeString } from '@ionic/angular';
-import { Capacitor } from '@capacitor/core';
 import { Router } from '@angular/router';
-import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
+import { DomSanitizer } from '@angular/platform-browser';
+
+import { ToastController, AlertController, LoadingController } from '@ionic/angular';
 
 @Injectable({
   providedIn: 'root'

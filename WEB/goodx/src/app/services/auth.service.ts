@@ -1,11 +1,13 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
+import { Router } from '@angular/router';
+
 import { Observable, from, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
+import { Http, HttpOptions } from '@capacitor-community/http';
+
 import { environment } from '../../../src/environments/environment';
 import { HttpHeaderService } from './http-headers.service';
-import { Http, HttpOptions } from '@capacitor-community/http';
-import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
@@ -54,3 +56,4 @@ export class AuthService {
     this.router.navigate(['/login']);
   }
 }
+

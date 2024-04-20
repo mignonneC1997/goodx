@@ -72,14 +72,16 @@ export class LoginPage implements OnInit, OnDestroy {
             if (Capacitor.getPlatform() === 'web') {
               // SAVE UID TO LOCALSTORAGE
               localStorage.setItem('userToken', response.data.uid);
+              localStorage.setItem('user', this.loginForm.get('username')?.value);
               this.toasterService.displaySuccessToast('successfully logged in');
-              this.router.navigate(['/bookings']);
+              this.router.navigate(['/dashboard']);
             } else if (Capacitor.getPlatform() === 'ios' || Capacitor.getPlatform() === 'android') {
               if (response.data.status === 'OK') {
                 // SAVE UID TO LOCALSTORAGE
                 localStorage.setItem('userToken', response.data.data.uid);
+                localStorage.setItem('user', this.loginForm.get('username')?.value)
                 this.toasterService.displaySuccessToast('successfully logged in');
-                this.router.navigate(['/bookings']);
+                this.router.navigate(['/dashboard']);
               } else {
                 this.toasterService.displayErrorToast(response.data.status);
               }
@@ -89,7 +91,15 @@ export class LoginPage implements OnInit, OnDestroy {
           },
           error: (err: ErrorEvent) => {
             this.isLoading = false;
-            this.toasterService.displayErrorToast(err.error.status);
+            if (err.error.status !== undefined) {
+               if (err.error.status !== undefined) {
+              this.toasterService.displayErrorToast(err.error.status);
+            } else {
+              this.toasterService.displayErrorToast(err.message);
+            }
+            } else {
+              this.toasterService.displayErrorToast(err.message);
+            }
           },
           complete: () => {
             return;

@@ -59,6 +59,7 @@ export class BookingsPage implements OnInit, OnDestroy {
   public selectedPatient:any = null;
   public selectedDuration = null;
   public isLoading: boolean = false;
+  public makeBooking = false;
   private destroy$: ReplaySubject<boolean> = new ReplaySubject(1);
 
   constructor(private toasterService: ToastmessageService, private formBuilder: FormBuilder,
@@ -127,7 +128,11 @@ export class BookingsPage implements OnInit, OnDestroy {
           }  
         },
         error: (err: ErrorEvent) => {
-          this.toasterService.displayErrorToast(err.error.status);
+            if (err.error.status !== undefined) {
+              this.toasterService.displayErrorToast(err.error.status);
+            } else {
+              this.toasterService.displayErrorToast(err.message);
+            }
         },
         complete: () => {
           return;
@@ -141,19 +146,23 @@ export class BookingsPage implements OnInit, OnDestroy {
 
   public getBookingTypes = () => {
     try {
-      const bookingStatusApiCall = Capacitor.getPlatform() === 'web' ? this.bookingService.bookingStatusWeb() : this.bookingService.bookingStatusNative();
+      const bookingStatusApiCall = Capacitor.getPlatform() === 'web' ? this.bookingService.bookingTypesWeb() : this.bookingService.bookingTypesNative();
       bookingStatusApiCall.pipe(takeUntil(this.destroy$)).subscribe({
         next: (response) => {
           if (Capacitor.getPlatform() === 'web' && response.status === 'OK') {
-            this.bookingStatuses = response.data;  
+            this.bookingTypes = response.data;  
           } else if ((Capacitor.getPlatform() === 'ios' || Capacitor.getPlatform() === 'android') && response.data.status === 'OK') {
-            this.bookingStatuses = response.data.data;  
+            this.bookingTypes = response.data.data;  
           }  else {
             return
           }  
         },
         error: (err: ErrorEvent) => {
-          this.toasterService.displayErrorToast(err.error.status);
+            if (err.error.status !== undefined) {
+              this.toasterService.displayErrorToast(err.error.status);
+            } else {
+              this.toasterService.displayErrorToast(err.message);
+            }
         },
         complete: () => {
           return;
@@ -195,7 +204,11 @@ export class BookingsPage implements OnInit, OnDestroy {
           } 
         },
         error: (err: ErrorEvent) => {
-          this.toasterService.displayErrorToast(err.error.status);
+            if (err.error.status !== undefined) {
+              this.toasterService.displayErrorToast(err.error.status);
+            } else {
+              this.toasterService.displayErrorToast(err.message);
+            }
         },
         complete: () => {
           this.getBookings();
@@ -295,7 +308,11 @@ export class BookingsPage implements OnInit, OnDestroy {
           }  
         },
         error: (err: ErrorEvent) => {
-          this.toasterService.displayErrorToast(err.error.status);
+            if (err.error.status !== undefined) {
+              this.toasterService.displayErrorToast(err.error.status);
+            } else {
+              this.toasterService.displayErrorToast(err.message);
+            }
         },
         complete: () => {
           return;
@@ -308,6 +325,7 @@ export class BookingsPage implements OnInit, OnDestroy {
   }
 
   public onTimeSelected = (ev: {selectedTime: Date; events: any[]}) => {
+    this.makeBooking = true;
     this.formattedStart = format(ev.selectedTime, 'HH:mm, MMM d, yyyy'); // format booking start time
     this.newBooking.startTime = format(ev.selectedTime, "yyyy-MM-dd'T'HH:mm:ss"); // add start date to new booking
 
@@ -437,7 +455,11 @@ export class BookingsPage implements OnInit, OnDestroy {
           },
           error: (err: ErrorEvent) => {
             this.isLoading = false;
-            this.toasterService.displayErrorToast(err.error.status);
+              if (err.error.status !== undefined) {
+              this.toasterService.displayErrorToast(err.error.status);
+            } else {
+              this.toasterService.displayErrorToast(err.message);
+            }
           },
           complete: () => {
             this.myCal.loadEvents();
@@ -501,7 +523,11 @@ export class BookingsPage implements OnInit, OnDestroy {
               },
               error: (err: ErrorEvent) => {
                 this.isLoading = false;
-                this.toasterService.displayErrorToast(err.error.status);
+                  if (err.error.status !== undefined) {
+              this.toasterService.displayErrorToast(err.error.status);
+            } else {
+              this.toasterService.displayErrorToast(err.message);
+            }
               },
               complete: () => {
                 this.myCal.loadEvents();
@@ -653,11 +679,16 @@ export class BookingsPage implements OnInit, OnDestroy {
               },
               error: (err: ErrorEvent) => {
                 this.isLoading = false;
-                this.toasterService.displayErrorToast(err.error.status);
+                  if (err.error.status !== undefined) {
+              this.toasterService.displayErrorToast(err.error.status);
+            } else {
+              this.toasterService.displayErrorToast(err.message);
+            }
               },
               complete: () => {
                 this.myCal.loadEvents(); // RELOAD CALENDAR
                 this.isLoading = false;
+                this.makeBooking = false;
                 this.modalAdd.dismiss()
                 return;
               }
@@ -686,6 +717,7 @@ export class BookingsPage implements OnInit, OnDestroy {
 
   ngOnDestroy() {
     // Unsubscribe to prevent memory leaks
+    this.makeBooking = false;
     this.presentingElement = null;
     this.calendar = {
       mode: 'month' as CalendarMode,

@@ -79,7 +79,11 @@ export class PatientPage implements OnInit, OnDestroy {
         },
         error: (err: ErrorEvent) => {
           this.isLoading = false;
-          this.toasterService.displayErrorToast(err.error.status);
+            if (err.error.status !== undefined) {
+              this.toasterService.displayErrorToast(err.error.status);
+            } else {
+              this.toasterService.displayErrorToast(err.message);
+            }
         },
         complete: () => {
           return;

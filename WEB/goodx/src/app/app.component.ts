@@ -1,13 +1,31 @@
-import { Component } from '@angular/core';
-import { BookingsService } from './services/bookings.service';
+import { Component, OnInit } from '@angular/core';
+
 import { StorageService } from './services/storage.service';
+import { AuthService } from './services/auth.service';
+import { webVersion } from '../../config';
+
 @Component({
   selector: 'app-root',
   templateUrl: 'app.component.html',
   styleUrls: ['app.component.scss'],
 })
-export class AppComponent {
-  constructor(private storageService: StorageService) {
+export class AppComponent implements OnInit {
+  public versionNumber:any = '';
+
+  constructor(private storageService: StorageService, private authApi: AuthService) {
     storageService.initStorage();
+  }
+
+  ngOnInit() {
+    this.getAppVersion();
+  }
+
+  public onLogout = () => {
+    this.authApi.logout();
+  }
+
+  public getAppVersion = () => {
+    // use @ionic-native/app-version in the future
+    this.versionNumber = webVersion;
   }
 }

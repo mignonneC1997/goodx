@@ -1,16 +1,9 @@
 <ion-header [translucent]="true">
   <ion-toolbar>
     <ion-buttons slot="start">
-      <ion-button (click)="patients()">
-        <ion-icon slot="icon-only" name="people" color="primary"></ion-icon>
-      </ion-button>
+      <ion-menu-button menu="main-menu"></ion-menu-button>
     </ion-buttons>
     <ion-title class="ion-text-center">Bookings</ion-title>
-    <ion-buttons slot="end">
-      <ion-button (click)="logout()">
-        <ion-icon slot="icon-only" name="log-out" color="primary"></ion-icon>
-      </ion-button>
-    </ion-buttons>
   </ion-toolbar>
 </ion-header>
 
@@ -56,8 +49,8 @@
 
   <!-- BOOKING FORM -->
   <form [formGroup]="bookingForm">
-    <ion-fab horizontal="center" vertical="bottom" horizontal="end" slot="fixed" >
-      <ion-fab-button (click)="openAddModal()">
+    <ion-fab horizontal="center" vertical="bottom" horizontal="end" slot="fixed">
+      <ion-fab-button (click)="openAddModal()" [disabled]="!makeBooking">
         <ion-icon name="add"></ion-icon>
       </ion-fab-button>
     </ion-fab>

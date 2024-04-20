@@ -49,6 +49,11 @@ ion-searchbar{
     }
 }
 
+ion-menu-button {
+    --color: var(--ion-color-primary)!important;
+    font-weight: bold;
+}
+
 ion-icon {
     right: 16px !important;
     left: auto !important;
@@ -84,6 +89,23 @@ ion-thumbnail {
 
 ion-card {
     text-align: center;
+}
+
+.userCard {
+    text-align: center;
+    background: #fff;
+    transition: transform 0.3s ease;
+}
+npx capacitor-assets generate
+
+.userCard:hover {
+    transform: scale(1.05); /* Increase size on hover */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Add box shadow on hover */
+}
+
+.userCard:active {
+    transform: scale(1.05); /* Increase size on hover */
+    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.2); /* Add box shadow on hover */
 }
 
 .cstUserCard {

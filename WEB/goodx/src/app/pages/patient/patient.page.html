@@ -1,28 +1,28 @@
 <ion-header>
   <ion-toolbar color="credicoblue" align="center">
       <ion-title class="ion-text-center" *ngIf="!seachbar">Patients</ion-title> 
-          <ion-buttons *ngIf="!seachbar" slot="start">
-              <ion-button (click)="showSearch()">
-                  <ion-icon name="search-outline" color="primary"></ion-icon>
-              </ion-button>
-          </ion-buttons>
-          <ion-buttons *ngIf="seachbar" slot="start">
-              <ion-button (click)="back()">
-                  <ion-icon name="arrow-back-outline" color="primary"></ion-icon>
-              </ion-button>
-          </ion-buttons>
-          <ion-buttons slot="end">
-            <ion-button (click)="dashboard()">
-              <ion-icon slot="icon-only" name="calendar" color="primary"></ion-icon>
-            </ion-button>
-          </ion-buttons>
-          <ion-searchbar *ngIf="seachbar" mode="md" showCancelButton="never" [(ngModel)]="searchstring" (input)="searchuser($event)" placeholder="Search User..."></ion-searchbar>
+      <ion-buttons slot="start" *ngIf="!seachbar">
+        <ion-menu-button menu="main-menu"></ion-menu-button>
+      </ion-buttons>
+      <ion-buttons *ngIf="!seachbar" slot="end">
+        <ion-button (click)="showSearch()">
+          <ion-icon name="search-outline" color="primary"></ion-icon>
+        </ion-button>
+      </ion-buttons>
+
+      <ion-searchbar *ngIf="seachbar" mode="md" showCancelButton="never" [(ngModel)]="searchstring" (input)="searchuser($event)" placeholder="Search User...">
+        <ion-buttons *ngIf="seachbar" slot="start">
+          <ion-button (click)="back()">
+            <ion-icon name="close-circle-outline" color="primary"></ion-icon>
+          </ion-button>
+        </ion-buttons>
+      </ion-searchbar>
   </ion-toolbar>
 </ion-header>
 <ion-content mode="ios">
   
   <!-- USER LIST -->
-  <ion-card *ngFor="let key of users; let i = index" class="my-2" (click)="viewProfile(key)">
+  <ion-card *ngFor="let key of users; let i = index" class="my-2 userCard" (click)="viewProfile(key)">
     <ion-grid>
       <ion-row class="usersList mx-0 my-0">
         <ion-col size="2">
