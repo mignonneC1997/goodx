@@ -90,3 +90,7 @@ ion-searchbar ion-icon {
 .searchbar-clear-icon {
     display: none !important;
 }
+
+ion-searchbar .searchbar-search-icon {
+    color: var(--ion-color-primary) !important;
+}

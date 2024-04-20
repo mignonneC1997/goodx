@@ -25,27 +25,9 @@ ion-grid {
     border-bottom: 1px solid #ccc;
 }
 
-ion-item {
-    display: contents;
-}
-
-h2 {
-    margin-left: .5em;
-}
-
 ion-spinner {
     transform: scale(2);
     margin-top: 2rem;
-}
-
-.infinite-scroll-color {
-    --color: #fff;
-    line {
-        color: #fff;
-    }
-    .infinite-loading-text {
-        color: #fff;
-    }
 }
 
 ion-searchbar{
@@ -70,20 +52,6 @@ ion-searchbar{
 ion-icon {
     right: 16px !important;
     left: auto !important;
-    transform: scale(1.5);
-    color: white;
-}
-
-.cstChatBtn{
-    margin: .5em;
-    background-color: white;
-    button {
-        --background: white;
-    }
-}
-
-.chatIcon {
-    color: rgba(78, 156, 78, 0.817);
 }
 
 .usersList {
@@ -92,32 +60,16 @@ ion-icon {
     margin: 0.5em;
 }
 
+h5 {
+    color: var(--ion-color-primary)!important;
+}
+
 .profileImages{
     clip-path: circle();
 }
 
-p {
-    margin-top: 0;
-    margin-bottom: 0;
-    color: #909192;
-    width: 20ch;
-    overflow: hidden;
-    white-space: nowrap;
-    text-overflow: ellipsis;
-}
-
 ion-thumbnail {
     margin-top: 1em;
-}
-
-.checkIcon {
-    margin-right: .5em;
-    color: #909192;
-}
-
-.checkedIcon{
-    margin-right: .5em;
-    color: #199ccc;
 }
 
 .thumbnail-container {
@@ -126,36 +78,16 @@ ion-thumbnail {
     height: 50px;
 }
 
-.notificationIcon {
-    position: absolute;
-    top: -20%;
-    right: -10% !important;
-    font-size: 20px;
-    color: #ec6666;
+.modal {
+    --background: var(--ion-color-light)!important
 }
 
-.number-icon {
-    display: contents;
-    position: relative;
+ion-card {
+    text-align: center;
 }
-
-.number {
-    position: absolute;
-    top: -15px;
-    right: -5px;
-    color: #fff;
-    padding: 2px 6px;
-    border-radius: 50%;
-    font-size: 14px;
-}
-
 
 .cstUserCard {
     margin: 0 1em;
-}
-
-.modal {
-    --background: var(--ion-color-light)!important
 }
 
 .group {
@@ -179,24 +111,6 @@ margin-bottom: 20px;
     width: 5px;
     height: 5px;
     border-radius: 50%;
-}
-
-.loading-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(204, 204, 204, 0.8);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 9999;
-}
-
-.loading-overlay ion-spinner {
-    --color: var(--ion-color-primary)!important;
-    transform:  scale(1.5);
 }
 
 .errorSpan {
@@ -240,8 +154,4 @@ ion-select.ng-invalid.ng-touched {
         max-height: 18em;
         padding-top: 1em;
     }
-}
-
-ion-card {
-    text-align: center;
 }

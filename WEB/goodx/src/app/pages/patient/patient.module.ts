@@ -5,7 +5,6 @@ import { FormsModule } from '@angular/forms';
 import { IonicModule } from '@ionic/angular';
 
 import { PatientPageRoutingModule } from './patient-routing.module';
-
 import { PatientPage } from './patient.page';
 
 @NgModule({
@@ -16,7 +15,7 @@ import { PatientPage } from './patient.page';
     PatientPageRoutingModule
   ],
   schemas: [
-    CUSTOM_ELEMENTS_SCHEMA // Add CUSTOM_ELEMENTS_SCHEMA here
+    CUSTOM_ELEMENTS_SCHEMA
   ],
   declarations: [PatientPage]
 })

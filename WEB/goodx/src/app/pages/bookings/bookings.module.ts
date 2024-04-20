@@ -3,11 +3,11 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 
 import { IonicModule } from '@ionic/angular';
+import { NgCalendarModule } from 'ionic6-calendar';
 
 import { BookingsPageRoutingModule } from './bookings-routing.module';
-
 import { BookingsPage } from './bookings.page';
-import { NgCalendarModule } from 'ionic6-calendar';
+
 
 @NgModule({
   imports: [
@@ -19,7 +19,7 @@ import { NgCalendarModule } from 'ionic6-calendar';
     NgCalendarModule
   ],
   schemas: [
-    CUSTOM_ELEMENTS_SCHEMA // Add CUSTOM_ELEMENTS_SCHEMA here
+    CUSTOM_ELEMENTS_SCHEMA
   ],
   declarations: [BookingsPage]
 })

@@ -1,12 +1,14 @@
 /* eslint-disable @angular-eslint/no-empty-lifecycle-method */
-import { Component, ElementRef, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
+
 import { Capacitor } from '@capacitor/core';
-import { IonModal, IonRouterOutlet, LoadingController } from '@ionic/angular';
+import { IonModal, IonRouterOutlet } from '@ionic/angular';
 import { ReplaySubject, takeUntil } from 'rxjs';
+
 import { PatientsService } from '../../services/patients.service';
-import { StorageService } from '../../services/storage.service';
 import { ToastmessageService } from '../../services/toaster.service';
+import { AuthService } from '../../services/auth.service';
 
 interface User {
   entity_uid: number;
@@ -30,19 +32,18 @@ interface User {
 })
 
 export class PatientPage implements OnInit, OnDestroy {
-  presentingElement:any = null;
+  @ViewChild('patientModal') patientModal!: IonModal;
+  public presentingElement:any = null;
   public isLoading: boolean = false;
-  public showViewButton = false;
   public users!: User[];
   public temparray: any;
   public searchstring: any;
   public seachbar = false;
   public selectedPatient:any;
-  @ViewChild('patientModal') patientModal!: IonModal;
   private destroy$: ReplaySubject<boolean> = new ReplaySubject(1);
 
-  constructor(private patientsApi: PatientsService, private toasterService: ToastmessageService, private el: ElementRef,
-    private storageS: StorageService, private router: Router, private loadingCtrl: LoadingController, private ionRouterOutlet: IonRouterOutlet) {
+  constructor(private patientsApi: PatientsService, private toasterService: ToastmessageService,
+    private router: Router, private ionRouterOutlet: IonRouterOutlet, private authApi: AuthService) {
       this.presentingElement = ionRouterOutlet.nativeEl;
     }
 
@@ -53,38 +54,28 @@ export class PatientPage implements OnInit, OnDestroy {
     this.getPatients();
   }
 
-  openAddModal() {
+  public openAddModal = () => {
     this.patientModal.present();
   }
 
-  getPatients() {
-    this.users = [];
-    this.isLoading = true;
-    if (Capacitor.getPlatform() === 'web') {
-      this.patientsApi.patientsWeb().pipe(takeUntil(this.destroy$)).subscribe({
+  public getPatients = () => {
+    try {
+      this.users = [];
+      this.isLoading = true;
+      const patientsApiCall = Capacitor.getPlatform() === 'web' ? this.patientsApi.patientsWeb() : this.patientsApi.patientsNative();
+    
+      patientsApiCall.pipe(takeUntil(this.destroy$)).subscribe({
         next: (response) => {
           this.isLoading = false;
-          this.users = response.data;
-          this.temparray = response.data;
-        },
-        error: (err: ErrorEvent) => {
-          this.isLoading = false;
-          this.toasterService.displayErrorToast(err.error.status);
-        },
-        complete: () => {
-          return;
-        }
-      });
-    } else {
-      this.patientsApi.patientsNative().pipe(takeUntil(this.destroy$)).subscribe({
-        next: (response) => {  
-          this.isLoading = false;
-          if (response.data.status === 'OK') {
+          if (Capacitor.getPlatform() === 'web' && response.status === 'OK') {
+            this.users = response.data;
+            this.temparray = response.data;
+          } else if ((Capacitor.getPlatform() === 'ios' || Capacitor.getPlatform() === 'android') && response.data.status === 'OK') {
             this.users = response.data.data;
             this.temparray = response.data.data;
-          } else {
-            this.toasterService.displayErrorToast(response.data.status);
-          }
+          }  else {
+            return;
+          } 
         },
         error: (err: ErrorEvent) => {
           this.isLoading = false;
@@ -94,16 +85,17 @@ export class PatientPage implements OnInit, OnDestroy {
           return;
         }
       });
+    } catch(err:any) {
+      this.isLoading = false;
+      throw new Error(err);
     }
   }
 
-  logout() {
-    this.storageS.clearData();
-    localStorage.clear();
-    this.router.navigate(['/login']);
+  public logout = () => {
+    this.authApi.logout();
   }
 
-  dashboard() {
+  public dashboard = () => {
     this.router.navigate(['/bookings']);
   }
 
@@ -112,13 +104,15 @@ export class PatientPage implements OnInit, OnDestroy {
     this.openAddModal();
   }
 
-  searchuser(ev: any) {
+  public searchuser = (ev:any) => {
+    // SEARCH USER IN USERS LIST
     this.users = this.temparray;
     const user =  ev.target.value;
     if (user.trim() === '') {
       return;
     }
 
+    // ONLY SHOW MATCHING USERS IN LIST
     this.users = this.users.filter((v: { name: string; }) => {
       if ((v.name.toLowerCase().indexOf(user.toLowerCase())) > -1) {
         return true;
@@ -134,6 +128,7 @@ export class PatientPage implements OnInit, OnDestroy {
   public back = () => {
     this.searchstring = '';
     this.seachbar = false;
+    // SET USER LIST TO ORIGINAL LIST AFTER SEARCH
     this.users = this.temparray;
   }
 
