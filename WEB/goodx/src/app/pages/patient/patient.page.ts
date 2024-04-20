@@ -61,43 +61,29 @@ export class PatientPage implements OnInit, OnDestroy {
   public getPatients = () => {
     this.users = [];
     this.isLoading = true;
-    if (Capacitor.getPlatform() === 'web') {
-      // GET PATIENTS LIST - WEB VERSION
-      this.patientsApi.patientsWeb().pipe(takeUntil(this.destroy$)).subscribe({
-        next: (response) => {
-          this.isLoading = false;
+    const patientsApiCall = Capacitor.getPlatform() === 'web' ? this.patientsApi.patientsWeb() : this.patientsApi.patientsNative();
+  
+    patientsApiCall.pipe(takeUntil(this.destroy$)).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        if (Capacitor.getPlatform() === 'web' && response.status === 'OK') {
           this.users = response.data;
           this.temparray = response.data;
-        },
-        error: (err: ErrorEvent) => {
-          this.isLoading = false;
-          this.toasterService.displayErrorToast(err.error.status);
-        },
-        complete: () => {
+        } else if ((Capacitor.getPlatform() === 'ios' || Capacitor.getPlatform() === 'android') && response.data.status === 'OK') {
+          this.users = response.data.data;
+          this.temparray = response.data.data;
+        }  else {
           return;
-        }
-      });
-    } else {
-       // GET PATIENTS LIST - APP VERSION
-      this.patientsApi.patientsNative().pipe(takeUntil(this.destroy$)).subscribe({
-        next: (response) => {  
-          this.isLoading = false;
-          if (response.data.status === 'OK') {
-            this.users = response.data.data;
-            this.temparray = response.data.data;
-          } else {
-            this.toasterService.displayErrorToast(response.data.status);
-          }
-        },
-        error: (err: ErrorEvent) => {
-          this.isLoading = false;
-          this.toasterService.displayErrorToast(err.error.status);
-        },
-        complete: () => {
-          return;
-        }
-      });
-    }
+        } 
+      },
+      error: (err: ErrorEvent) => {
+        this.isLoading = false;
+        this.toasterService.displayErrorToast(err.error.status);
+      },
+      complete: () => {
+        return;
+      }
+    });
   }
 
   public logout = () => {

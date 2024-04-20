@@ -63,48 +63,37 @@ export class LoginPage implements OnInit, OnDestroy {
         ]
       ]
     }
+    const loginApiCall = Capacitor.getPlatform() === 'web' ? this.loginApi.loginWeb(this.loginData) : this.loginApi.loginNative(this.loginData);
     if (this.loginForm.valid) {
-      if (Capacitor.getPlatform() === 'web') {
-        // LOGIN - WEB VERSION
-        this.loginApi.loginWeb(this.loginData).pipe(takeUntil(this.destroy$)).subscribe({
-          next: (response) => {
-            this.isLoading = false;
+      loginApiCall.pipe(takeUntil(this.destroy$)).subscribe({
+        next: (response) => {
+          this.isLoading = false;
+          if (Capacitor.getPlatform() === 'web') {
             // SAVE UID TO LOCALSTORAGE
             localStorage.setItem('userToken', response.data.uid);
             this.toasterService.displaySuccessToast('successfully logged in');
             this.router.navigate(['/bookings']);
-          },
-          error: (err: ErrorEvent) => {
-            this.isLoading = false;
-            this.toasterService.displayErrorToast(err.error.status);
-          },
-          complete: () => {
-            return;
-          }
-        });
-      } else {
-        // LOGIN - APP VERSION
-        this.loginApi.loginNative(this.loginData).pipe(takeUntil(this.destroy$)).subscribe({
-          next: (response) => { 
-            this.isLoading = false; 
+          } else if (Capacitor.getPlatform() === 'ios' || Capacitor.getPlatform() === 'android') {
             if (response.data.status === 'OK') {
-               // SAVE UID TO LOCALSTORAGE
+              // SAVE UID TO LOCALSTORAGE
               localStorage.setItem('userToken', response.data.data.uid);
               this.toasterService.displaySuccessToast('successfully logged in');
               this.router.navigate(['/bookings']);
             } else {
               this.toasterService.displayErrorToast(response.data.status);
             }
-          },
-          error: (err: ErrorEvent) => {
-            this.isLoading = false;
-            this.toasterService.displayErrorToast(err.error.status);
-          },
-          complete: () => {
+          } else {
             return;
           }
-        });
-      }
+        },
+        error: (err: ErrorEvent) => {
+          this.isLoading = false;
+          this.toasterService.displayErrorToast(err.error.status);
+        },
+        complete: () => {
+          return;
+        }
+      });
     }
   }
 

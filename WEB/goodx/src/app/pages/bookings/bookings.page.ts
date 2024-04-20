@@ -71,6 +71,7 @@ export class BookingsPage implements OnInit, OnDestroy {
   }
 
   async ionViewDidEnter() {
+    this.isLoading = true;
     this.getPatients();
     this.getBookingTypes();
     this.getBookingStatuses();
@@ -96,73 +97,45 @@ export class BookingsPage implements OnInit, OnDestroy {
   }
 
   public getBookingStatuses = () => {
-    if (Capacitor.getPlatform() === 'web') {
-      // GET BOOKING STATUSES - WEB VERSION
-      this.bookingService.bookingStatusWeb().pipe(takeUntil(this.destroy$)).subscribe({
-        next: (response) => {
-          this.bookingStatuses = response.data;
-        },
-        error: (err: ErrorEvent) => {
-          this.toasterService.displayErrorToast(err.error.status);
-        },
-        complete: () => {
-          return;
-        }
-      });
-    } else {
-      // GET BOOKING STATUSES - APP VERSION
-      this.bookingService.bookingStatusNative().pipe(takeUntil(this.destroy$)).subscribe({
-        next: (response) => {
-          this.isLoading = false;
-          if (response.data.status === 'OK') {
-            this.bookingStatuses = response.data.data;
-          } else {
-            this.toasterService.displayErrorToast(response.data.status);
-          }
-        },
-        error: (err: ErrorEvent) => {
-          this.isLoading = false;
-          this.toasterService.displayErrorToast(err.error.status);
-        },
-        complete: () => {
-          return;
-        }
-      });
-    }
+    const bookingStatusApiCall = Capacitor.getPlatform() === 'web' ? this.bookingService.bookingStatusWeb() : this.bookingService.bookingStatusNative();
+    bookingStatusApiCall.pipe(takeUntil(this.destroy$)).subscribe({
+      next: (response) => {
+        if (Capacitor.getPlatform() === 'web' && response.status === 'OK') {
+          this.bookingStatuses = response.data;  
+        } else if ((Capacitor.getPlatform() === 'ios' || Capacitor.getPlatform() === 'android') && response.data.status === 'OK') {
+          this.bookingStatuses = response.data.data;  
+        }  else {
+          return
+        }  
+      },
+      error: (err: ErrorEvent) => {
+        this.toasterService.displayErrorToast(err.error.status);
+      },
+      complete: () => {
+        return;
+      }
+    });
   }
 
   public getBookingTypes = () => {
-    if (Capacitor.getPlatform() === 'web') {
-      // GET BOOKING TYPES - WEB VERSION
-      this.bookingService.bookingTypesWeb().pipe(takeUntil(this.destroy$)).subscribe({
-        next: (response) => {
-          this.bookingTypes = response.data;        
-        },
-        error: (err: ErrorEvent) => {
-          this.toasterService.displayErrorToast(err.error.status);
-        },
-        complete: () => {
+    const bookingTypesApiCall = Capacitor.getPlatform() === 'web' ? this.bookingService.bookingTypesWeb() : this.bookingService.bookingTypesNative();
+    bookingTypesApiCall.pipe(takeUntil(this.destroy$)).subscribe({
+      next: (response) => {
+        if (Capacitor.getPlatform() === 'web' && response.status === 'OK') {
+          this.bookingTypes = response.data;  
+        } else if ((Capacitor.getPlatform() === 'ios' || Capacitor.getPlatform() === 'android') && response.data.status === 'OK') {
+          this.bookingTypes = response.data.data;  
+        }  else {
           return;
-        }
-      });
-    } else {
-      // GET BOOKING TYPES - APP VERSION
-      this.bookingService.bookingTypesNative().pipe(takeUntil(this.destroy$)).subscribe({
-        next: (response) => {
-          if (response.data.status === 'OK') {
-            this.bookingTypes = response.data.data;  
-          } else {
-            this.toasterService.displayErrorToast(response.data.status);
-          }
-        },
-        error: (err: ErrorEvent) => {
-          this.toasterService.displayErrorToast(err.error.status);
-        },
-        complete: () => {
-          return;
-        }
-      });
-    }
+        }     
+      },
+      error: (err: ErrorEvent) => {
+        this.toasterService.displayErrorToast(err.error.status);
+      },
+      complete: () => {
+        return;
+      }
+    });
   }
 
   public openAddModal = async () => {
@@ -179,150 +152,120 @@ export class BookingsPage implements OnInit, OnDestroy {
   }
 
   public getPatients = () => {
-    if (Capacitor.getPlatform() === 'web') {
-      // GET PATIENTS - WEB VERSION
-      this.patientsApi.patientsWeb().pipe(takeUntil(this.destroy$)).subscribe({
-        next: (response) => {
-          this.patientList = response.data;
-        },
-        error: (err: ErrorEvent) => {
-          this.toasterService.displayErrorToast(err.error.status);
-        },
-        complete: () => {
-          this.getBookings();
+    const patientsApiCall = Capacitor.getPlatform() === 'web' ? this.patientsApi.patientsWeb() : this.patientsApi.patientsNative();
+  
+    patientsApiCall.pipe(takeUntil(this.destroy$)).subscribe({
+      next: (response) => {
+        if (Capacitor.getPlatform() === 'web' && response.status === 'OK') {
+          this.patientList = response.data;  
+        } else if ((Capacitor.getPlatform() === 'ios' || Capacitor.getPlatform() === 'android') && response.data.status === 'OK') {
+          this.patientList = response.data.data;  
+        }  else {
           return;
-        }
-      });
-    } else {
-      // GET PATIENTS - APP VERSION
-      this.patientsApi.patientsNative().pipe(takeUntil(this.destroy$)).subscribe({
-        next: (response) => {
-          if (response.data.status === 'OK') {
-            this.patientList = response.data.data;
-          } else {
-            this.toasterService.displayErrorToast(response.data.status);
-          }
-        },
-        error: (err: ErrorEvent) => {
-          this.toasterService.displayErrorToast(err.error.status);
-        },
-        complete: () => {
-          this.getBookings();
-          return;
-        }
-      });
-    }
+        } 
+      },
+      error: (err: ErrorEvent) => {
+        this.toasterService.displayErrorToast(err.error.status);
+      },
+      complete: () => {
+        this.getBookings();
+        return;
+      }
+    });
   }
 
   public getBookings = () => {
-    this.isLoading = true;
     let tempArray: any[] = [];
     let patientObject: any =[];
-      if (Capacitor.getPlatform() === 'web') {
-        // GET BOOKINGS - WEB VIEW
-        this.bookingService.bookingWeb().pipe(takeUntil(this.destroy$)).subscribe({
-          next: (response) => {
-            this.isLoading = false;
-            // ADD RESPONSE DATA TO BOOKING SOURCE TO DISPLAY IN CALENDAR
-            response.data.map((item: any, index: string | number) => {
-              if (response.data[index].cancelled === false) {
-                // CREATE FUTURE TIME BY ADDING START TIME + DURATION
-                let startTime = new Date(response.data[index].start_time);
-                let futureDate:any = new Date(startTime);
-                futureDate.setMinutes(startTime.getMinutes() + response.data[index].duration);
-                futureDate = format(futureDate, "yyyy-MM-dd'T'HH:mm:ss");
-                if (response.data[index].patient_uid !== null) {
-                  patientObject = this.patientList.find((obj: { [x: string]: any; }) => obj['uid'] === response.data[index].patient_uid); 
-                }
-                const toAdd = {
-                  title: patientObject.name + ' - ' + response.data[index].reason,
-                  allDay: false,
-                  startTime: new Date(response.data[index].start_time),
-                  endTime: new Date(futureDate),
-                  uid: response.data[index].uid,
-                  reason: response.data[index].reason,
-                  entity_uid: response.data[index].entity_uid, 
-                  start_time: response.data[index].start_time,
-                  patient_uid: response.data[index].patient_uid,
-                  booking_status_uid: response.data[index].booking_status_uid,
-                  booking_type_uid: response.data[index].booking_type_uid,
-                  diary_uid: response.data[index].diary_uid,
-                  duration: response.data[index].duration
-                }
-  
-                tempArray.push(toAdd);
+    const bookingsApiCall = Capacitor.getPlatform() === 'web' ? this.bookingService.bookingWeb() : this.bookingService.bookingsNative();
+    bookingsApiCall.pipe(takeUntil(this.destroy$)).subscribe({
+      next: (response) => {
+        this.isLoading = false;
+        if (Capacitor.getPlatform() === 'web' && response.status === 'OK') {
+          // ADD RESPONSE DATA TO BOOKING SOURCE TO DISPLAY IN CALENDAR
+          response.data.map((item: any, index: string | number) => {
+            if (response.data[index].cancelled === false) {
+              // CREATE FUTURE TIME BY ADDING START TIME + DURATION
+              let startTime = new Date(response.data[index].start_time);
+              let futureDate:any = new Date(startTime);
+              futureDate.setMinutes(startTime.getMinutes() + response.data[index].duration);
+              futureDate = format(futureDate, "yyyy-MM-dd'T'HH:mm:ss");
+              if (response.data[index].patient_uid !== null) {
+                patientObject = this.patientList.find((obj: { [x: string]: any; }) => obj['uid'] === response.data[index].patient_uid); 
               }
-            });
-            // REMOVE DUPLICATE BOOKINGS FROM ARRAY
-            this.bookingSource = tempArray.filter((obj: { uid: any; }, index: any, self: any[]) =>
-              index === self.findIndex((t) => (
-                  t.uid === obj.uid
-              ))
-            );
-          },
-          error: (err: ErrorEvent) => {
-            this.isLoading = false;
-            this.toasterService.displayErrorToast(err.error.status);
-          },
-          complete: () => {
-            return;
-          }
-        });
-      } else {
-        // GET BOOKINGS - APP VIEW
-        this.bookingService.bookingsNative().pipe(takeUntil(this.destroy$)).subscribe({
-          next: (response) => {
-            this.isLoading = false;
-            if (response.data.status === 'OK') {
-              // ADD RESPONSE DATA TO BOOKING SOURCE TO DISPLAY IN CALENDAR
-              response.data.data.map((item: any, index: string | number) => {
-                if (response.data.data[index].cancelled === false) {
-                  // CREATE FUTURE TIME BY ADDING START TIME + DURATION
-                  let startTime = new Date(response.data.data[index].start_time);
-                  let futureDate:any = new Date(startTime);
-                  futureDate.setMinutes(startTime.getMinutes() + response.data.data[index].duration);
-                  futureDate = format(futureDate, "yyyy-MM-dd'T'HH:mm:ss");
-                  if (response.data.data[index].patient_uid !== null) {
-                    patientObject = this.patientList.find((obj: { [x: string]: any; }) => obj['uid'] === response.data.data[index].patient_uid);
-                  }
-                  const toAdd = {
-                    title: patientObject.name + ' - ' + response.data.data[index].reason,
-                    allDay: false,
-                    startTime: new Date(response.data.data[index].start_time),
-                    endTime: new Date(futureDate),
-                    uid: response.data.data[index].uid,
-                    reason: response.data.data[index].reason,
-                    entity_uid: response.data.data[index].entity_uid, 
-                    start_time: response.data.data[index].start_time,
-                    patient_uid: response.data.data[index].patient_uid,
-                    booking_status_uid: response.data.data[index].booking_status_uid,
-                    booking_type_uid: response.data.data[index].booking_type_uid,
-                    diary_uid: response.data.data[index].diary_uid,
-                    duration: response.data.data[index].duration
-                  }
-    
-                  tempArray.push(toAdd);
-                }
-              });
-              // REMOVE DUPLICATE BOOKINGS FROM ARRAY
-              this.bookingSource = tempArray.filter((obj: { uid: any; }, index: any, self: any[]) =>
-                index === self.findIndex((t) => (
-                    t.uid === obj.uid
-                ))
-              );
-            } else {
-              this.toasterService.displayErrorToast(response.data.status);
+              const toAdd = {
+                title: patientObject.name + ' - ' + response.data[index].reason,
+                allDay: false,
+                startTime: new Date(response.data[index].start_time),
+                endTime: new Date(futureDate),
+                uid: response.data[index].uid,
+                reason: response.data[index].reason,
+                entity_uid: response.data[index].entity_uid, 
+                start_time: response.data[index].start_time,
+                patient_uid: response.data[index].patient_uid,
+                booking_status_uid: response.data[index].booking_status_uid,
+                booking_type_uid: response.data[index].booking_type_uid,
+                diary_uid: response.data[index].diary_uid,
+                duration: response.data[index].duration
+              }
+
+              tempArray.push(toAdd);
             }
-          },
-          error: (err: ErrorEvent) => {
-            this.isLoading = false;
-            this.toasterService.displayErrorToast(err.error.status);
-          },
-          complete: () => {
-            return;
-          }
-        });
+          });
+          // REMOVE DUPLICATE BOOKINGS FROM ARRAY
+          this.bookingSource = tempArray.filter((obj: { uid: any; }, index: any, self: any[]) =>
+            index === self.findIndex((t) => (
+                t.uid === obj.uid
+            ))
+          );
+        } else if ((Capacitor.getPlatform() === 'ios' || Capacitor.getPlatform() === 'android') && response.data.status === 'OK') {
+          // ADD RESPONSE DATA TO BOOKING SOURCE TO DISPLAY IN CALENDAR
+          response.data.data.map((item: any, index: string | number) => {
+            if (response.data.data[index].cancelled === false) {
+              // CREATE FUTURE TIME BY ADDING START TIME + DURATION
+              let startTime = new Date(response.data.data[index].start_time);
+              let futureDate:any = new Date(startTime);
+              futureDate.setMinutes(startTime.getMinutes() + response.data.data[index].duration);
+              futureDate = format(futureDate, "yyyy-MM-dd'T'HH:mm:ss");
+              if (response.data.data[index].patient_uid !== null) {
+                patientObject = this.patientList.find((obj: { [x: string]: any; }) => obj['uid'] === response.data.data[index].patient_uid);
+              }
+              const toAdd = {
+                title: patientObject.name + ' - ' + response.data.data[index].reason,
+                allDay: false,
+                startTime: new Date(response.data.data[index].start_time),
+                endTime: new Date(futureDate),
+                uid: response.data.data[index].uid,
+                reason: response.data.data[index].reason,
+                entity_uid: response.data.data[index].entity_uid, 
+                start_time: response.data.data[index].start_time,
+                patient_uid: response.data.data[index].patient_uid,
+                booking_status_uid: response.data.data[index].booking_status_uid,
+                booking_type_uid: response.data.data[index].booking_type_uid,
+                diary_uid: response.data.data[index].diary_uid,
+                duration: response.data.data[index].duration
+              }
+
+              tempArray.push(toAdd);
+            }
+          });
+          // REMOVE DUPLICATE BOOKINGS FROM ARRAY
+          this.bookingSource = tempArray.filter((obj: { uid: any; }, index: any, self: any[]) =>
+            index === self.findIndex((t) => (
+                t.uid === obj.uid
+            ))
+          );
+        }  else {
+          return
+        }  
+      },
+      error: (err: ErrorEvent) => {
+        this.toasterService.displayErrorToast(err.error.status);
+      },
+      complete: () => {
+        return;
       }
+    });
   }
 
   public onTimeSelected = (ev: {selectedTime: Date; events: any[]}) => {
@@ -423,85 +366,56 @@ export class BookingsPage implements OnInit, OnDestroy {
         booking_type_uid: this.bookingForm.get('booking_type_uid')?.value
       }
 
-      if (Capacitor.getPlatform() === 'web') {
-        // UPDATE BOOKING ON WEB VERSION
-        this.bookingService.updateBookingWeb(updateData).pipe(takeUntil(this.destroy$)).subscribe({
-          next: (response) => {
-            const index = this.bookingSource.findIndex((obj: { uid: any; }) => obj.uid === this.newBooking.uid);   
-           // If the booking object is found, update its values with toAdd
-            if (index !== -1) {
-              this.bookingSource[index] = toAdd;
-            } else {
-              return;
-            }
-            this.myCal.loadEvents();
-            this.toasterService.displaySuccessToast('successfully updated booking');
-          },
-          error: (err: ErrorEvent) => {
-            this.isLoading = false;
-            this.toasterService.displayErrorToast(err.error.status);
-          },
-          complete: () => {
-            this.newBooking = {
-              title: '',
-              allDay: false,
-              startTime: null,
-              endTime: null,
-              entity_uid: 4,
-              diary_uid: 4,
-              booking_type_uid: null,
-              booking_status_uid: null,
-              start_time: null,
-              duration: null,
-              patient_uid: null,
-              reason: null,
-              cancelled: false
-            }
-            this.isLoading = false;
-            this.modalEdit.dismiss()
-            return;
-        }
-        });
-      } else {
-        // UPDATE BOOKING ON APP VERSION
-        this.bookingService.updateBookingNative(updateData).pipe(takeUntil(this.destroy$)).subscribe({
-          next: (response) => {
-            this.toasterService.displaySuccessToast('successfully updated booking');
+      const bookingUpdateApiCall = Capacitor.getPlatform() === 'web' ? this.bookingService.updateBookingWeb(updateData) : this.bookingService.updateBookingNative(updateData);
+      bookingUpdateApiCall.pipe(takeUntil(this.destroy$)).subscribe({
+        next: (response) => {
+          this.isLoading = false;
+          if (Capacitor.getPlatform() === 'web' && response.status === 'OK') {
             const index = this.bookingSource.findIndex((obj: { uid: any; }) => obj.uid === this.newBooking.uid);   
             // If the booking object is found, update its values with toAdd
             if (index !== -1) {
               this.bookingSource[index] = toAdd;
             } else {
-                return;
+              return;
             }
-            this.myCal.loadEvents();
-          },
-          error: (err: ErrorEvent) => {
-            this.isLoading = false;
-            this.toasterService.displayErrorToast(err.error.status);
-          },
-          complete: () => {
-            this.newBooking = {
-              title: '',
-              allDay: false,
-              startTime: null,
-              endTime: null,
-              entity_uid: 4,
-              diary_uid: 4,
-              booking_type_uid: null,
-              booking_status_uid: null,
-              start_time: null,
-              duration: null,
-              patient_uid: null,
-              reason: null,
-              cancelled: false
+          } else if ((Capacitor.getPlatform() === 'ios' || Capacitor.getPlatform() === 'android') && response.data.status === 'OK') {
+            const index = this.bookingSource.findIndex((obj: { uid: any; }) => obj.uid === this.newBooking.uid);   
+            // If the booking object is found, update its values with toAdd
+            if (index !== -1) {
+              this.bookingSource[index] = toAdd;
+            } else {
+              return;
             }
-            this.isLoading = false;
-            this.modalEdit.dismiss()
+          }  else {
             return;
+          }     
+        },
+        error: (err: ErrorEvent) => {
+          this.isLoading = false;
+          this.toasterService.displayErrorToast(err.error.status);
+        },
+        complete: () => {
+          this.myCal.loadEvents();
+          this.toasterService.displaySuccessToast('successfully updated booking');
+          this.newBooking = {
+            title: '',
+            allDay: false,
+            startTime: null,
+            endTime: null,
+            entity_uid: 4,
+            diary_uid: 4,
+            booking_type_uid: null,
+            booking_status_uid: null,
+            start_time: null,
+            duration: null,
+            patient_uid: null,
+            reason: null,
+            cancelled: false
           }
-        });
-      }
+          this.isLoading = false;
+          this.modalEdit.dismiss();
+        }
+      });
     }
   }
 
@@ -523,73 +437,45 @@ export class BookingsPage implements OnInit, OnDestroy {
           return;
         } else {
           // DELETE BOOKING - USER SELECTED 'YES'
-          if (Capacitor.getPlatform() === 'web') {
-            // DELETE BOOKING ON WEB VERSION
-            this.bookingService.removeBookingWeb(updateData).pipe(takeUntil(this.destroy$)).subscribe({
-              next: (response) => {
-                this.myCal.loadEvents();
+          const bookingDeleteApiCall = Capacitor.getPlatform() === 'web' ? this.bookingService.removeBookingWeb(updateData) : this.bookingService.removeBookingNative(updateData);
+          bookingDeleteApiCall.pipe(takeUntil(this.destroy$)).subscribe({
+            next: (response) => {
+              this.isLoading = false;
+              if (Capacitor.getPlatform() === 'web' && response.status === 'OK') {
                 this.toasterService.displaySuccessToast('successfully deleted booking');
-              },
-              error: (err: ErrorEvent) => {
-                this.isLoading = false;
-                this.toasterService.displayErrorToast(err.error.status);
-              },
-              complete: () => {
-                this.getBookings();
-                this.newBooking = {
-                  title: '',
-                  allDay: false,
-                  startTime: null,
-                  endTime: null,
-                  entity_uid: 4,
-                  diary_uid: 4,
-                  booking_type_uid: null,
-                  booking_status_uid: null,
-                  start_time: null,
-                  duration: null,
-                  patient_uid: null,
-                  reason: null,
-                  cancelled: false
-                }
-                this.isLoading = false;
-                this.modalEdit.dismiss()
+              } else if ((Capacitor.getPlatform() === 'ios' || Capacitor.getPlatform() === 'android') && response.data.status === 'OK') {
+                  this.toasterService.displaySuccessToast('successfully deleted booking');
+              }  else {
                 return;
-            }
-            });
-          } else {
-            // DELETE BOOKING ON APP VERSION
-            this.bookingService.removeBookingNative(updateData).pipe(takeUntil(this.destroy$)).subscribe({
-              next: (response) => {
-                this.toasterService.displaySuccessToast('successfully deleted booking');
-                this.myCal.loadEvents();
-              },
-              error: (err: ErrorEvent) => {
-                this.isLoading = false;
-                this.toasterService.displayErrorToast(err.error.status);
-              },
-              complete: () => {
-                this.newBooking = {
-                  title: '',
-                  allDay: false,
-                  startTime: null,
-                  endTime: null,
-                  entity_uid: 4,
-                  diary_uid: 4,
-                  booking_type_uid: null,
-                  booking_status_uid: null,
-                  start_time: null,
-                  duration: null,
-                  patient_uid: null,
-                  reason: null,
-                  cancelled: false
-                }
-                this.getBookings();
-                this.isLoading = false;
-                this.modalEdit.dismiss()
-                return;
+              }     
+            },
+            error: (err: ErrorEvent) => {
+              this.isLoading = false;
+              this.toasterService.displayErrorToast(err.error.status);
+            },
+            complete: () => {
+              this.myCal.loadEvents();
+              this.getBookings();
+              this.newBooking = {
+                title: '',
+                allDay: false,
+                startTime: null,
+                endTime: null,
+                entity_uid: 4,
+                diary_uid: 4,
+                booking_type_uid: null,
+                booking_status_uid: null,
+                start_time: null,
+                duration: null,
+                patient_uid: null,
+                reason: null,
+                cancelled: false
               }
-            });
-          }
+              this.isLoading = false;
+              this.modalEdit.dismiss()
+              return;
+            }
+          });
         }
       });
     }
@@ -655,11 +541,11 @@ export class BookingsPage implements OnInit, OnDestroy {
         this.newBooking.start_time = this.bookingForm.get('start_time')?.value;
 
         if (this.bookingForm.valid) { // VALID FORM VALUES
-          if (Capacitor.getPlatform() === 'web') {
-            // SAVE BOOKING ON WEB VERSION
-            this.bookingService.makeBookingWeb(this.newBooking).pipe(takeUntil(this.destroy$)).subscribe({
-              next: (response) => {
-                this.isLoading = false;
+          const bookingAddApiCall = Capacitor.getPlatform() === 'web' ? this.bookingService.makeBookingWeb(this.newBooking) : this.bookingService.makeBookingNative(this.newBooking);
+          bookingAddApiCall.pipe(takeUntil(this.destroy$)).subscribe({
+            next: (response) => {
+              this.isLoading = false;
+              if (Capacitor.getPlatform() === 'web' && response.status === 'OK') {
                 this.toasterService.displaySuccessToast('Successfull booked');
                 let startTime = new Date(response.data.start_time);
                 let futureDate:any = new Date(startTime);
@@ -682,23 +568,8 @@ export class BookingsPage implements OnInit, OnDestroy {
                   duration: response.data.duration
                 }
                 this.bookingSource.push(toAdd); // ADD NEW BOOKING TO BOOKINGS ARRAY
-                this.myCal.loadEvents(); // RELOAD CALENDAR
-              },
-              error: (err: ErrorEvent) => {
-                this.isLoading = false;
-                this.toasterService.displayErrorToast(err.error.status);
-              },
-              complete: () => {
-                this.isLoading = false;
-                this.modalAdd.dismiss()
-                return;
-              }
-            });
-          } else {
-            // SAVE BOOKING ON NATIVE VERSION
-            this.bookingService.makeBookingNative(this.newBooking).pipe(takeUntil(this.destroy$)).subscribe({
-              next: (response) => {
-                this.isLoading = false;
+                this.toasterService.displaySuccessToast('successfully deleted booking');
+              } else if ((Capacitor.getPlatform() === 'ios' || Capacitor.getPlatform() === 'android') && response.data.status === 'OK') {
                 this.toasterService.displaySuccessToast('Successfull booked');
                 let startTime = new Date(response.data.data.start_time);
                 let futureDate:any = new Date(startTime);
@@ -720,37 +591,22 @@ export class BookingsPage implements OnInit, OnDestroy {
                   diary_uid: response.data.data.diary_uid,
                   duration: response.data.data.duration
                 }
-
                 this.bookingSource.push(toAdd); // ADD NEW BOOKING TO BOOKINGS ARRAY
-                this.myCal.loadEvents(); // RELOAD CALENDAR
-              },
-              error: (err: ErrorEvent) => {
-                this.isLoading = false;
-                this.toasterService.displayErrorToast(err.error.status);
-              },
-              complete: () => {
-                // CLEAR BOOKING OBJECT - PREVENT MEMORY LEAKS
-                this.newBooking = {
-                  title: '',
-                  allDay: false,
-                  startTime: null,
-                  endTime: null,
-                  entity_uid: 4,
-                  diary_uid: 4,
-                  booking_type_uid: null,
-                  booking_status_uid: null,
-                  start_time: null,
-                  duration: null,
-                  patient_uid: null,
-                  reason: null,
-                  cancelled: false
-                }
-                this.isLoading = false;
-                this.modalEdit.dismiss()
+              }  else {
                 return;
-              }
-            });
-          }
+              }     
+            },
+            error: (err: ErrorEvent) => {
+              this.isLoading = false;
+              this.toasterService.displayErrorToast(err.error.status);
+            },
+            complete: () => {
+              this.myCal.loadEvents(); // RELOAD CALENDAR
+              this.isLoading = false;
+              this.modalAdd.dismiss()
+              return;
+            }
+          });
         } else {
           this.toasterService.displayErrorToast('Fill in all required fields');
         }
