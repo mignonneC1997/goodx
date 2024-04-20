@@ -542,23 +542,23 @@ export class BookingsPage implements OnInit, OnDestroy {
   }
 
   public scheduleBooking = () => {
-    this.toasterService.confirmBookingPrompt('Confirm Booking').then((res) => {
-      if (res === false) {
-        // DO NOT SAVE BOOKING - USER SELECTED 'NO'
-        return;
-      } else {
-        // SAVE BOOKING - USER SELECTED 'YES'
-        const duration = this.calculateDuration(this.newBooking.startTime, this.newBooking.endTime);
-        this.bookingForm.patchValue({duration : duration });
-        this.newBooking.duration = duration;
-        this.newBooking.booking_status_uid = this.bookingForm.get('booking_status_uid')?.value;
-        this.newBooking.booking_type_uid = this.bookingForm.get('booking_type_uid')?.value;
-        this.newBooking.patient_uid = this.bookingForm.get('patient_uid')?.value;
-        this.newBooking.reason = this.bookingForm.get('reason')?.value;
-        this.bookingForm.patchValue({'start_time': this.newBooking.startTime})
-        this.newBooking.start_time = this.bookingForm.get('start_time')?.value;
+    const duration = this.calculateDuration(this.newBooking.startTime, this.newBooking.endTime);
+    this.bookingForm.patchValue({duration : duration });
+    this.newBooking.duration = duration;
+    this.newBooking.booking_status_uid = this.bookingForm.get('booking_status_uid')?.value;
+    this.newBooking.booking_type_uid = this.bookingForm.get('booking_type_uid')?.value;
+    this.newBooking.patient_uid = this.bookingForm.get('patient_uid')?.value;
+    this.newBooking.reason = this.bookingForm.get('reason')?.value;
+    this.bookingForm.patchValue({'start_time': this.newBooking.startTime})
+    this.newBooking.start_time = this.bookingForm.get('start_time')?.value;
 
-        if (this.bookingForm.valid) { // VALID FORM VALUES
+    if (this.bookingForm.valid) { // VALID FORM VALUES
+      this.toasterService.confirmBookingPrompt('Confirm Booking').then((res) => {
+        if (res === false) {
+          // DO NOT SAVE BOOKING - USER SELECTED 'NO'
+          return;
+        } else {
+          // SAVE BOOKING - USER SELECTED 'YES'
           const bookingAddApiCall = Capacitor.getPlatform() === 'web' ? this.bookingService.makeBookingWeb(this.newBooking) : this.bookingService.makeBookingNative(this.newBooking);
           bookingAddApiCall.pipe(takeUntil(this.destroy$)).subscribe({
             next: (response) => {
@@ -625,13 +625,14 @@ export class BookingsPage implements OnInit, OnDestroy {
               return;
             }
           });
-        } else {
-          this.toasterService.displayErrorToast('Fill in all required fields');
         }
-      }
-    }).catch(err => {
-      this.toasterService.displayErrorToast('Could not open booking prompt');
-    });
+      }).catch(err => {
+        this.toasterService.displayErrorToast('Could not open booking prompt');
+      });
+
+    } else {
+        this.toasterService.displayErrorToast('Fill in all required fields');
+    }
   }
 
   public logout = () => {
