@@ -3,11 +3,12 @@ import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/htt
 import { Router } from '@angular/router';
 
 import { Observable, from, throwError } from 'rxjs';
-import { catchError, map } from 'rxjs/operators';
+import { catchError, map, timeout } from 'rxjs/operators';
 import { Http, HttpOptions } from '@capacitor-community/http';
 
 import { environment } from '../../../src/environments/environment';
 import { HttpHeaderService } from './http-headers.service';
+import { responsetimeout } from '../../../config';
 
 @Injectable({
   providedIn: 'root'
@@ -18,11 +19,12 @@ export class AuthService {
 
   public loginWeb = (data:any): Observable<any> => {
       return this.http.post<any>(environment.urlWeb + 'session', data, { headers: this.httpHeaderService.getHTTPHeaders(), observe: 'response' }).pipe(
-      map((response: HttpResponse<any>) => {
-        return response.body;
-      }), catchError((error: HttpErrorResponse) => {
-        return throwError(() => error);
-      })
+        timeout(responsetimeout),
+        map((response: HttpResponse<any>) => {
+          return response.body;
+        }), catchError((error: HttpErrorResponse) => {
+          return throwError(() => error);
+        })
       ); 
   }
 

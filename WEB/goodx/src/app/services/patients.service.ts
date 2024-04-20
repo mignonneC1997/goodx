@@ -7,6 +7,7 @@ import { catchError, map, timeout } from 'rxjs/operators';
 
 import { environment } from '../../../src/environments/environment';
 import { HttpHeaderService } from './http-headers.service';
+import { responsetimeout } from '../../../config';
 
 @Injectable({
   providedIn: 'root'
@@ -16,13 +17,14 @@ export class PatientsService {
   constructor(private http: HttpClient, private httpHeaderService: HttpHeaderService) { }
 
   public patientsWeb = (): Observable<any> => {
-      return this.http.get<any>(environment.urlWeb + 'patient?fields=["entity_uid","id","debtor_uid","name","surname","initials","title","date_of_birth","mobile_no","gender","benefit_check","id_no","email","file_no","dependant_no","dependant_type","acc_identifier","private"]', { headers: this.httpHeaderService.getHTTPHeaders(), observe: 'response' }).pipe(
+    return this.http.get<any>(environment.urlWeb + 'patient?fields=["entity_uid","id","debtor_uid","name","surname","initials","title","date_of_birth","mobile_no","gender","benefit_check","id_no","email","file_no","dependant_no","dependant_type","acc_identifier","private"]', { headers: this.httpHeaderService.getHTTPHeaders(), observe: 'response' }).pipe(
+      timeout(responsetimeout),
       map((response: HttpResponse<any>) => {
         return response.body;
       }), catchError((error: HttpErrorResponse) => {
         return throwError(() => error);
       })
-      ); 
+    ); 
   }
 
   public patientsNative = (): Observable<any> => {
