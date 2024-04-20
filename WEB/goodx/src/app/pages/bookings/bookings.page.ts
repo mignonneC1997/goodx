@@ -68,13 +68,29 @@ export class BookingsPage implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.buildForm();
+    // Subscribe to changes in the duration control
+    this.bookingForm.get('duration')?.valueChanges.subscribe((value) => {   
+      const endTime = this.calculateEndTime(this.newBooking.startTime, value);
+      this.newBooking.endTime = endTime;
+      this.endChanged(endTime);
+    });
   }
 
-  async ionViewDidEnter() {
+  ionViewDidEnter() {
     this.isLoading = true;
     this.getPatients();
     this.getBookingTypes();
     this.getBookingStatuses();
+  }
+
+  public calculateEndTime = (startTime: any, durationMinutes: any) => {
+    const startDate = new Date(startTime);
+    // Calculate end time in milliseconds
+    const endTimeMilliseconds = startDate.getTime() + (durationMinutes * 60000);
+    const endDate = new Date(endTimeMilliseconds);
+    // Convert end time to ISO 8601 format
+    const endTimeISO = endDate.toISOString();
+    return endTimeISO;
   }
 
   public buildForm = () => {
@@ -139,7 +155,9 @@ export class BookingsPage implements OnInit, OnDestroy {
   }
 
   public openAddModal = async () => {
-    this.bookingForm.patchValue({reason: '', allDay: false, selectedPatient:  null, selectedBookingStatus: null, selectedBookingType: null });
+    const duration = this.calculateDuration(this.newBooking.startTime, this.newBooking.endTime);
+    this.bookingForm.patchValue({reason: '', allDay: false, selectedPatient:  null, selectedBookingStatus: null, selectedBookingType: null, duration: duration });
+    this.selectedPatient = null;
     await this.patientModal.dismiss();
     await this.modalEdit.dismiss();
     this.modalAdd.present();
