@@ -5,13 +5,14 @@ import { catchError, map } from 'rxjs/operators';
 import { environment } from '../../../src/environments/environment';
 import { HttpHeaderService } from './http-headers.service';
 import { Http, HttpOptions } from '@capacitor-community/http';
+import { Router } from '@angular/router';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
 
-  constructor(private http: HttpClient, private httpHeaderService: HttpHeaderService) { }
+  constructor(private http: HttpClient, private httpHeaderService: HttpHeaderService, private router: Router) { }
 
   public loginWeb = (data:any): Observable<any> => {
       return this.http.post<any>(environment.urlWeb + 'session', data, { headers: this.httpHeaderService.getHTTPHeaders(), observe: 'response' }).pipe(
@@ -46,5 +47,10 @@ export class AuthService {
           observer.error(error);  // Emit the error
         }));
     });
+  }
+
+  public logout = () => {
+    localStorage.clear(); // CLEAR STORAGE DATA
+    this.router.navigate(['/login']);
   }
 }

@@ -33,7 +33,7 @@ export class LoginPage implements OnInit, OnDestroy {
   public isLoading: boolean = false;
   private destroy$: ReplaySubject<boolean> = new ReplaySubject(1);
 
-  constructor(private formBuilder: FormBuilder, private router: Router, private loginApi: AuthService, private toasterService: ToastmessageService) {}
+  constructor(private formBuilder: FormBuilder, private router: Router, private authApi: AuthService, private toasterService: ToastmessageService) {}
 
   ngOnInit() {
     this.buildForm();
@@ -48,52 +48,57 @@ export class LoginPage implements OnInit, OnDestroy {
   }
 
   public login = () => {
-    this.isLoading = true;
-    this.loginData = {
-      "model": {
-        "timeout": timeout
-      },
-      "auth": [
-        [
-          "password",
-          {
-            "username": this.loginForm.get('username')?.value,
-            "password": this.loginForm.get('password')?.value
-          }
+    try {
+      this.isLoading = true;
+      this.loginData = {
+        "model": {
+          "timeout": timeout
+        },
+        "auth": [
+          [
+            "password",
+            {
+              "username": this.loginForm.get('username')?.value,
+              "password": this.loginForm.get('password')?.value
+            }
+          ]
         ]
-      ]
-    }
-    const loginApiCall = Capacitor.getPlatform() === 'web' ? this.loginApi.loginWeb(this.loginData) : this.loginApi.loginNative(this.loginData);
-    if (this.loginForm.valid) {
-      loginApiCall.pipe(takeUntil(this.destroy$)).subscribe({
-        next: (response) => {
-          this.isLoading = false;
-          if (Capacitor.getPlatform() === 'web') {
-            // SAVE UID TO LOCALSTORAGE
-            localStorage.setItem('userToken', response.data.uid);
-            this.toasterService.displaySuccessToast('successfully logged in');
-            this.router.navigate(['/bookings']);
-          } else if (Capacitor.getPlatform() === 'ios' || Capacitor.getPlatform() === 'android') {
-            if (response.data.status === 'OK') {
+      }
+      const loginApiCall = Capacitor.getPlatform() === 'web' ? this.authApi.loginWeb(this.loginData) : this.authApi.loginNative(this.loginData);
+      if (this.loginForm.valid) {
+        loginApiCall.pipe(takeUntil(this.destroy$)).subscribe({
+          next: (response) => {
+            this.isLoading = false;
+            if (Capacitor.getPlatform() === 'web') {
               // SAVE UID TO LOCALSTORAGE
-              localStorage.setItem('userToken', response.data.data.uid);
+              localStorage.setItem('userToken', response.data.uid);
               this.toasterService.displaySuccessToast('successfully logged in');
               this.router.navigate(['/bookings']);
+            } else if (Capacitor.getPlatform() === 'ios' || Capacitor.getPlatform() === 'android') {
+              if (response.data.status === 'OK') {
+                // SAVE UID TO LOCALSTORAGE
+                localStorage.setItem('userToken', response.data.data.uid);
+                this.toasterService.displaySuccessToast('successfully logged in');
+                this.router.navigate(['/bookings']);
+              } else {
+                this.toasterService.displayErrorToast(response.data.status);
+              }
             } else {
-              this.toasterService.displayErrorToast(response.data.status);
+              return;
             }
-          } else {
+          },
+          error: (err: ErrorEvent) => {
+            this.isLoading = false;
+            this.toasterService.displayErrorToast(err.error.status);
+          },
+          complete: () => {
             return;
           }
-        },
-        error: (err: ErrorEvent) => {
-          this.isLoading = false;
-          this.toasterService.displayErrorToast(err.error.status);
-        },
-        complete: () => {
-          return;
-        }
-      });
+        });
+      }
+    } catch(err:any) {
+      this.isLoading = false;
+      throw new Error(err);
     }
   }
 

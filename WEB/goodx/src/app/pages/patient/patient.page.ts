@@ -7,8 +7,8 @@ import { IonModal, IonRouterOutlet } from '@ionic/angular';
 import { ReplaySubject, takeUntil } from 'rxjs';
 
 import { PatientsService } from '../../services/patients.service';
-import { StorageService } from '../../services/storage.service';
 import { ToastmessageService } from '../../services/toaster.service';
+import { AuthService } from '../../services/auth.service';
 
 interface User {
   entity_uid: number;
@@ -43,7 +43,7 @@ export class PatientPage implements OnInit, OnDestroy {
   private destroy$: ReplaySubject<boolean> = new ReplaySubject(1);
 
   constructor(private patientsApi: PatientsService, private toasterService: ToastmessageService,
-    private storageS: StorageService, private router: Router, private ionRouterOutlet: IonRouterOutlet) {
+    private router: Router, private ionRouterOutlet: IonRouterOutlet, private authApi: AuthService) {
       this.presentingElement = ionRouterOutlet.nativeEl;
     }
 
@@ -59,36 +59,40 @@ export class PatientPage implements OnInit, OnDestroy {
   }
 
   public getPatients = () => {
-    this.users = [];
-    this.isLoading = true;
-    const patientsApiCall = Capacitor.getPlatform() === 'web' ? this.patientsApi.patientsWeb() : this.patientsApi.patientsNative();
-  
-    patientsApiCall.pipe(takeUntil(this.destroy$)).subscribe({
-      next: (response) => {
-        this.isLoading = false;
-        if (Capacitor.getPlatform() === 'web' && response.status === 'OK') {
-          this.users = response.data;
-          this.temparray = response.data;
-        } else if ((Capacitor.getPlatform() === 'ios' || Capacitor.getPlatform() === 'android') && response.data.status === 'OK') {
-          this.users = response.data.data;
-          this.temparray = response.data.data;
-        }  else {
+    try {
+      this.users = [];
+      this.isLoading = true;
+      const patientsApiCall = Capacitor.getPlatform() === 'web' ? this.patientsApi.patientsWeb() : this.patientsApi.patientsNative();
+    
+      patientsApiCall.pipe(takeUntil(this.destroy$)).subscribe({
+        next: (response) => {
+          this.isLoading = false;
+          if (Capacitor.getPlatform() === 'web' && response.status === 'OK') {
+            this.users = response.data;
+            this.temparray = response.data;
+          } else if ((Capacitor.getPlatform() === 'ios' || Capacitor.getPlatform() === 'android') && response.data.status === 'OK') {
+            this.users = response.data.data;
+            this.temparray = response.data.data;
+          }  else {
+            return;
+          } 
+        },
+        error: (err: ErrorEvent) => {
+          this.isLoading = false;
+          this.toasterService.displayErrorToast(err.error.status);
+        },
+        complete: () => {
           return;
-        } 
-      },
-      error: (err: ErrorEvent) => {
-        this.isLoading = false;
-        this.toasterService.displayErrorToast(err.error.status);
-      },
-      complete: () => {
-        return;
-      }
-    });
+        }
+      });
+    } catch(err:any) {
+      this.isLoading = false;
+      throw new Error(err);
+    }
   }
 
   public logout = () => {
-    localStorage.clear(); // CLEAR STORAGE DATA
-    this.router.navigate(['/login']);
+    this.authApi.logout();
   }
 
   public dashboard = () => {
