@@ -49,6 +49,11 @@ ion-searchbar{
     }
 }
 
+ion-menu-button {
+    --color: var(--ion-color-primary)!important;
+    font-weight: bold;
+}
+
 ion-icon {
     right: 16px !important;
     left: auto !important;

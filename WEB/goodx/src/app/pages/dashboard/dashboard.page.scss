@@ -19,6 +19,11 @@
     --background: linear-gradient(var(--ion-color-medium), var(--ion-color-light)) !important;
 }
 
+ion-menu-button {
+    --color: var(--ion-color-primary)!important;
+    font-weight: bold;
+}
+
 ion-card {
     height: 10rem;
 }
@@ -53,6 +58,14 @@ h2 {
 .dashboard-card {
     width: 100%; /* Take up full width of the container */
     margin: 10px 0; /* Add vertical margin between cards */
+    --background: linear-gradient(#0082c8, #1974a5) !important;
+}
+
+.dashboard-card:hover {
+    opacity: 0.8;
+    --background: linear-gradient(#0082c8, #1974a5) !important;
+}
+.dashboard-card:active {
     --background: linear-gradient(#0082c8, #1974a5) !important;
 }
 

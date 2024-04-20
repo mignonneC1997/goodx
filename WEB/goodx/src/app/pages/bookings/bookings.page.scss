@@ -57,6 +57,11 @@ margin-bottom: 20px;
     transform:  scale(1.5);
 }
 
+ion-menu-button {
+    --color: var(--ion-color-primary)!important;
+    font-weight: bold;
+}
+
 .errorSpan {
     color: red;
     font-weight: 600;

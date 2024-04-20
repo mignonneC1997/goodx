@@ -1,0 +1,72 @@
+.my-custom-menu {
+    --width: 50%;
+}
+
+.cstVersion {
+font-size: small;
+text-align: center;
+    ion-label {
+        pointer-events: visible !important;
+    }
+}
+
+ion-icon {
+    font-size: 2rem;
+    color: var(--ion-color-primary)!important;
+}
+
+
+ion-menu-button {
+    --color: var(--ion-color-primary)!important;
+    font-weight: bold;
+}
+
+ion-img {
+    height: 5rem;
+}
+
+ion-title {
+    --color: var(--ion-color-dark)!important;
+    font-weight: 600;
+    font-family: "Maven Pro",sans-serif;
+    font-style: normal;
+}
+
+.allCenter {
+    font-family: "Maven Pro",sans-serif;
+    font-style: normal;
+    display: flex;
+    justify-content: center;
+    white-space: nowrap;
+    color: aliceblue;
+    font-size: large;
+    margin: 0 auto;
+    margin-top: 1rem;
+}
+
+.themeIcon {
+    color: #ffffff;
+    margin-top: -0.2rem;
+    margin-left: 1rem;
+}
+
+.cstFooter {
+    background-position: center;
+    transition: background 0.8s;
+}
+
+.cstFooter:active {
+    --background: var(--ion-color-dark)!important;
+    background-size: 100%;
+    transition: background 0s;
+}
+
+@media only screen and (max-width: 380px) {
+    ion-menu-button {
+        --color: var(--ion-color-dark)!important;
+    }
+}
+
+ion-footer {
+    background: var(--ion-color-light)!important;
+}
