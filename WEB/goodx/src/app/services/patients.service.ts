@@ -1,10 +1,12 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpErrorResponse, HttpResponse } from '@angular/common/http';
+
+import { Http, HttpOptions } from '@capacitor-community/http';
 import { Observable, from, throwError } from 'rxjs';
 import { catchError, map, timeout } from 'rxjs/operators';
+
 import { environment } from '../../../src/environments/environment';
 import { HttpHeaderService } from './http-headers.service';
-import { Http, HttpOptions } from '@capacitor-community/http';
 
 @Injectable({
   providedIn: 'root'

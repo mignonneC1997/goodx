@@ -25,7 +25,6 @@ export class AppComponent implements OnInit {
   }
 
   public getAppVersion = () => {
-    console.log(webVersion);
     // use @ionic-native/app-version in the future
     this.versionNumber = webVersion;
   }

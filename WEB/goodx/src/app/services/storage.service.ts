@@ -1,5 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Storage } from '@ionic/storage-angular';
+
 import { BookingsService } from './bookings.service';
 
 const STORAGE_KEY = 'mybookings';
@@ -44,5 +45,4 @@ export class StorageService {
     booking.push(item);
     return await this.storage.set(STORAGE_KEY, booking);
   }
-
 }

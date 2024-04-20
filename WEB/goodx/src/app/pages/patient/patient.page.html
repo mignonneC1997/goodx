@@ -1,7 +1,7 @@
 <ion-header>
   <ion-toolbar color="credicoblue" align="center">
       <ion-title class="ion-text-center" *ngIf="!seachbar">Patients</ion-title> 
-      <ion-buttons slot="start">
+      <ion-buttons slot="start" *ngIf="!seachbar">
         <ion-menu-button menu="main-menu"></ion-menu-button>
       </ion-buttons>
       <ion-buttons *ngIf="!seachbar" slot="end">
@@ -22,7 +22,7 @@
 <ion-content mode="ios">
   
   <!-- USER LIST -->
-  <ion-card *ngFor="let key of users; let i = index" class="my-2" (click)="viewProfile(key)">
+  <ion-card *ngFor="let key of users; let i = index" class="my-2 userCard" (click)="viewProfile(key)">
     <ion-grid>
       <ion-row class="usersList mx-0 my-0">
         <ion-col size="2">

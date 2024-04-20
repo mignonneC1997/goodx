@@ -58,15 +58,16 @@ h2 {
 .dashboard-card {
     width: 100%; /* Take up full width of the container */
     margin: 10px 0; /* Add vertical margin between cards */
-    --background: linear-gradient(#0082c8, #1974a5) !important;
+    --background: linear-gradient(#0498e8, #1974a5) !important;
 }
 
 .dashboard-card:hover {
     opacity: 0.8;
-    --background: linear-gradient(#0082c8, #1974a5) !important;
+    --background: linear-gradient(#016fab, #145d85) !important;
 }
+
 .dashboard-card:active {
-    --background: linear-gradient(#0082c8, #1974a5) !important;
+    --background: linear-gradient(#016fab, #145d85) !important;
 }
 
 .center-content {

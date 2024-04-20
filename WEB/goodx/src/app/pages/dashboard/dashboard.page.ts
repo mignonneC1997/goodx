@@ -1,10 +1,12 @@
 /* eslint-disable @angular-eslint/no-empty-lifecycle-method */
-import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { Capacitor } from '@capacitor/core';
+
 import { takeUntil, ReplaySubject } from 'rxjs';
-import { BookingsService } from 'src/app/services/bookings.service';
-import { PatientsService } from 'src/app/services/patients.service';
+
+import { BookingsService } from '../../services/bookings.service';
+import { PatientsService } from '../../services/patients.service';
 
 @Component({
   selector: 'app-dashboard',
@@ -85,11 +87,11 @@ export class DashboardPage implements OnInit {
     }
   }
 
-  goToBookings() {
+  public goToBookings = () => {
     this.router.navigate(['/bookings']);
   }
 
-  goToPatients() {
+  public goToPatients = () => {
     this.router.navigate(['/patient']);
   }
 }
