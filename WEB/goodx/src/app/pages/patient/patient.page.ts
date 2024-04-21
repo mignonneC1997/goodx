@@ -7,7 +7,7 @@ import { IonModal, IonRouterOutlet } from '@ionic/angular';
 import { ReplaySubject, takeUntil } from 'rxjs';
 
 import { PatientsService } from '../../services/patients.service';
-import { ToastmessageService } from '../../services/toaster.service';
+import { ToasterService } from '../../services/toaster.service';
 import { AuthService } from '../../services/auth.service';
 
 interface User {
@@ -42,7 +42,7 @@ export class PatientPage implements OnInit, OnDestroy {
   public selectedPatient:any;
   private destroy$: ReplaySubject<boolean> = new ReplaySubject(1);
 
-  constructor(private patientsApi: PatientsService, private toasterService: ToastmessageService,
+  constructor(private patientsApi: PatientsService, private toasterService: ToasterService,
     private router: Router, ionRouterOutlet: IonRouterOutlet, private authApi: AuthService) {
       this.presentingElement = ionRouterOutlet.nativeEl;
     }

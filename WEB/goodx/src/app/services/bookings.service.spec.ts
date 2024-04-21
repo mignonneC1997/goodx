@@ -1,11 +1,11 @@
 import { TestBed } from '@angular/core/testing';
+import { HttpClientTestingModule } from '@angular/common/http/testing';
+import { RouterTestingModule } from '@angular/router/testing';
+import { ActivatedRoute, Router } from '@angular/router'
+
+import { IonRouterOutlet } from '@ionic/angular';
 
 import { BookingsService } from './bookings.service';
-import { HttpClientTestingModule } from '@angular/common/http/testing';
-import { HttpHeaderService } from './http-headers.service';
-import { RouterTestingModule } from '@angular/router/testing';
-import { ActivatedRoute, Router } from '@angular/router';
-import { IonRouterOutlet } from '@ionic/angular';
 
 describe('BookingsService', () => {
   let service: BookingsService;
@@ -27,7 +27,7 @@ describe('BookingsService', () => {
   });
 
 
-  it('should be created', () => {
+  it('BookingsService should be created', () => {
     expect(service).toBeTruthy();
   });
 });

@@ -52,7 +52,7 @@ h2 {
     display: flex;
     flex-direction: column; /* Stack cards vertically */
     align-items: center; /* Center cards horizontally */
-    padding: 20px; /* Add padding */
+    padding: 20px;
 }
 
 .dashboard-card {
@@ -83,7 +83,6 @@ ion-card-content{
 ion-icon {
     color: #fff;
     transform: scale(3);
-   // padding-left: .5em;
 }
 
 .patientsAmount {

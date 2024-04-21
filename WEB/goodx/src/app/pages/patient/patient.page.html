@@ -1,5 +1,5 @@
 <ion-header>
-  <ion-toolbar color="credicoblue" align="center">
+  <ion-toolbar align="center">
       <ion-title class="ion-text-center" *ngIf="!seachbar">Patients</ion-title> 
       <ion-buttons slot="start" *ngIf="!seachbar">
         <ion-menu-button menu="main-menu"></ion-menu-button>
@@ -40,8 +40,8 @@
     </ion-grid>
   </ion-card>
 
-   <!-- PATIENT PROFILE -->
-   <ion-modal #patientModal [presentingElement]="presentingElement">
+  <!-- PATIENT PROFILE -->
+  <ion-modal #patientModal [presentingElement]="presentingElement">
     <ng-template>
       <ion-header>
         <ion-toolbar>

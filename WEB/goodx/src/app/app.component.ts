@@ -1,5 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 
+import { AppVersion } from '@ionic-native/app-version/ngx';
+import { Platform } from '@ionic/angular';
+
 import { AuthService } from './services/auth.service';
 import { webVersion } from '../../config';
 
@@ -11,7 +14,7 @@ import { webVersion } from '../../config';
 export class AppComponent implements OnInit {
   public versionNumber:any = '';
 
-  constructor(private authApi: AuthService) {
+  constructor(private authApi: AuthService, private appVersion: AppVersion, private platform: Platform) {
   }
 
   ngOnInit() {
@@ -23,7 +26,13 @@ export class AppComponent implements OnInit {
   }
 
   public getAppVersion = () => {
-    // use @ionic-native/app-version in the future
-    this.versionNumber = webVersion;
+    if (this.platform.is('capacitor')) { // NATIVE
+      this.appVersion.getVersionNumber().then((res) => {
+        console.log(res);
+        this.versionNumber = res;
+    })
+    } else { // WEB
+      this.versionNumber = webVersion;
+    }
   }
 }

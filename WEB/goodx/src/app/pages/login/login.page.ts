@@ -6,7 +6,7 @@ import { Capacitor } from '@capacitor/core';;
 import { ReplaySubject, takeUntil } from 'rxjs';
 
 import { AuthService } from '../../services/auth.service';
-import {  ToastmessageService } from '../../services/toaster.service';
+import {  ToasterService } from '../../services/toaster.service';
 import { timeout } from '../../../../config';
 
 @Component({
@@ -33,10 +33,14 @@ export class LoginPage implements OnInit, OnDestroy {
   public isLoading: boolean = false;
   private destroy$: ReplaySubject<boolean> = new ReplaySubject(1);
 
-  constructor(private formBuilder: FormBuilder, private router: Router, private authApi: AuthService, private toasterService: ToastmessageService) {}
+  constructor(private formBuilder: FormBuilder, private router: Router, private authApi: AuthService, private toasterService: ToasterService) {}
 
   ngOnInit() {
     this.buildForm();
+  }
+
+  ionViewDidEnter() {
+    this.loginForm.patchValue({'username': '', 'password': ''});
   }
 
   public buildForm = () => {
@@ -92,11 +96,11 @@ export class LoginPage implements OnInit, OnDestroy {
           error: (err: ErrorEvent) => {
             this.isLoading = false;
             if (err.error.status !== undefined) {
-               if (err.error.status !== undefined) {
-              this.toasterService.displayErrorToast(err.error.status);
-            } else {
-              this.toasterService.displayErrorToast(err.message);
-            }
+              if (err.error.status !== undefined) {
+                this.toasterService.displayErrorToast(err.error.status);
+              } else {
+                this.toasterService.displayErrorToast(err.message);
+              }
             } else {
               this.toasterService.displayErrorToast(err.message);
             }

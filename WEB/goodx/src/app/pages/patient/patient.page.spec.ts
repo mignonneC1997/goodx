@@ -1,9 +1,11 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { PatientPage } from './patient.page';
 import { RouterTestingModule } from '@angular/router/testing';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
+
 import { IonRouterOutlet } from '@ionic/angular';
+
+import { PatientPage } from './patient.page';
 
 describe('PatientPage', () => {
   let component: PatientPage;
@@ -30,15 +32,15 @@ describe('PatientPage', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('PatientPage should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize with seachbar false', () => {
+  it('PatientPage should initialize with seachbar false', () => {
     expect(component.seachbar).toBeFalse();
   });
 
-  it('should toggle seachbar when showSearch is called', () => {
+  it('PatientPage should toggle seachbar when showSearch is called', () => {
     const initialSeachbarValue = component.seachbar;
     component.showSearch();
     expect(component.seachbar).toBe(!initialSeachbarValue);

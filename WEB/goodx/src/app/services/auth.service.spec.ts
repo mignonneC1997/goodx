@@ -1,20 +1,16 @@
 import { TestBed } from '@angular/core/testing';
-
-import { AuthService } from './auth.service';
 import { HttpClientTestingModule, HttpTestingController } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
-import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { timeout } from 'config';
-import { environment } from 'src/environments/environment';
+import { ActivatedRoute, Router } from '@angular/router';
 
-const RouterSpy = jasmine.createSpyObj(
-  'Router',
-  ['navigate']
-);
+import { AuthService } from './auth.service';
+import { timeout } from '../../../config';
+import { environment } from '../../environments/environment';
+
 
 describe('AuthService', () => {
   let service: AuthService;
-  let httpMock: HttpTestingController;
+  let httpMock: HttpTestingController; // create mock service for api call testing
 
   beforeEach(() => {
     TestBed.configureTestingModule({
@@ -24,7 +20,7 @@ describe('AuthService', () => {
       ],
       providers: [
         AuthService,
-        { provide: ActivatedRoute,   useValue: ActivatedRoute    },
+        { provide: ActivatedRoute,   useValue: ActivatedRoute },
         { provide: Router, useValue: {}}
       ]
     });
@@ -32,15 +28,15 @@ describe('AuthService', () => {
     httpMock = TestBed.inject(HttpTestingController);
   });
 
-  it('should be created', () => {
-    expect(service).toBeTruthy();
+  it('AuthService should be created', () => {
+    expect(service).toBeTruthy(); // service created successfully
   });
 
   afterEach(() => {
     httpMock.verify();
   });
 
-  it('should send login request', () => {
+  it('AuthService should send login request', () => {
     const loginData = {
       "model": {
         "timeout": timeout
@@ -58,9 +54,9 @@ describe('AuthService', () => {
 
     service.loginWeb(loginData).subscribe(response => {
       expect(response).toBeTruthy();
-      // Add more expectations based on your response
     });
 
+    // make API call to mock service
     const req = httpMock.expectOne(environment.urlWeb + 'session');
     expect(req.request.method).toBe('POST');
     expect(req.request.body).toEqual(loginData);
