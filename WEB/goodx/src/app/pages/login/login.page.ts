@@ -39,6 +39,10 @@ export class LoginPage implements OnInit, OnDestroy {
     this.buildForm();
   }
 
+  ionViewDidEnter() {
+    this.loginForm.patchValue({'username': '', 'password': ''});
+  }
+
   public buildForm = () => {
     // BUILD REACTIVE FORM - VALIDATION
     this.loginForm = this.formBuilder.group({
@@ -92,11 +96,11 @@ export class LoginPage implements OnInit, OnDestroy {
           error: (err: ErrorEvent) => {
             this.isLoading = false;
             if (err.error.status !== undefined) {
-               if (err.error.status !== undefined) {
-              this.toasterService.displayErrorToast(err.error.status);
-            } else {
-              this.toasterService.displayErrorToast(err.message);
-            }
+              if (err.error.status !== undefined) {
+                this.toasterService.displayErrorToast(err.error.status);
+              } else {
+                this.toasterService.displayErrorToast(err.message);
+              }
             } else {
               this.toasterService.displayErrorToast(err.message);
             }

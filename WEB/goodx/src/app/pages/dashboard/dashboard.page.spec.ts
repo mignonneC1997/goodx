@@ -1,8 +1,9 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { DashboardPage } from './dashboard.page';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { RouterTestingModule } from '@angular/router/testing';
 import { CUSTOM_ELEMENTS_SCHEMA, NO_ERRORS_SCHEMA } from '@angular/core';
+
+import { DashboardPage } from './dashboard.page';
 
 describe('DashboardPage', () => {
   let component: DashboardPage;
@@ -22,15 +23,15 @@ describe('DashboardPage', () => {
     fixture.detectChanges();
   });
 
-  it('should create', () => {
+  it('DashboardPage should create', () => {
     expect(component).toBeTruthy();
   });
 
-  it('should initialize with isLoading false', () => {
+  it('DashboardPage should initialize with isLoading false', () => {
     expect(component.isLoading).toBeFalse();
   });
 
-  it('should render the ion-header with correct content', () => {
+  it('DashboardPage should render the ion-header with correct content', () => {
     const ionHeaderElement: HTMLIonHeaderElement | null = fixture.nativeElement.querySelector('ion-header');
     expect(ionHeaderElement!).toBeTruthy();
 
@@ -51,7 +52,7 @@ describe('DashboardPage', () => {
     expect(ionIconElement!.getAttribute('name')).toBe('location');
   });
 
-  it('should render the ion-content with correct content', () => {
+  it('DashboardPage should render the ion-content with correct content', () => {
     const ionContentElement: HTMLElement | null = fixture.nativeElement.querySelector('ion-content');
     expect(ionContentElement).toBeTruthy();
 

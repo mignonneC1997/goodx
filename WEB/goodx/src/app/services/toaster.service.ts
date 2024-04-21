@@ -1,6 +1,4 @@
 import { Injectable,  } from '@angular/core';
-import { Router } from '@angular/router';
-import { DomSanitizer } from '@angular/platform-browser';
 
 import { ToastController, AlertController, LoadingController } from '@ionic/angular';
 
@@ -9,10 +7,9 @@ import { ToastController, AlertController, LoadingController } from '@ionic/angu
 })
 
 export class ToasterService {
-  constructor(private toast: ToastController, private alertController: AlertController, private route: Router,
-    public loadingController: LoadingController, private sanitizer: DomSanitizer) { }
+  constructor(private toast: ToastController, private alertController: AlertController, public loadingController: LoadingController) { }
 
-  async displayWarningToast(warning:any) {
+  public displayWarningToast = async (warning:any) =>{
     const toast = await this.toast.create({
       message: warning,
       duration: 5000,
@@ -22,7 +19,7 @@ export class ToasterService {
     toast.present();
   }
 
-  async displayErrorToast(error:any) {
+  public displayErrorToast = async (error:any) => {
     const toast = await this.toast.create({
       message: error,
       duration: 5000,
@@ -32,7 +29,7 @@ export class ToasterService {
     toast.present();
   }
 
-  async displayResponseToast(resp:any) {
+  public displayResponseToast = async (resp:any) => {
     const toast = await this.toast.create({
       message: resp,
       duration: 5000,
@@ -42,7 +39,7 @@ export class ToasterService {
     toast.present();
   }
 
-  async displaySuccessToast(resp:any) {
+  public displaySuccessToast = async (resp:any) => {
     const toast = await this.toast.create({
       message: resp,
       duration: 3000,
@@ -52,7 +49,7 @@ export class ToasterService {
     toast.present();
   }
 
-  async confirmBookingPrompt(msg:any) {
+  public confirmBookingPrompt = async (msg:any) => {
     let response = false;
     const alert = await this.alertController.create({
     header: 'Booking',
