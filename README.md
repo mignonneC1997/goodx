@@ -1,4 +1,4 @@
-# GoodX Assesent (v1.1.0)
+# GoodX Assesent (v1.0.0)
 
 Application which can be used by medical staff (e.g. a doctor or nurse) to get a summary of their daily schedule (diary), as well as perform basic operations on their diary.
  
@@ -28,7 +28,7 @@ Navigate to `http://localhost:8100/`
 ## Unit tests
 
 ```bash
-Run ionic test
+Run ng test
 ```
 
 ## Build
@@ -52,7 +52,7 @@ z = bug fixes of minor updates
 
 #### Current version
 
-* release 1.1.0
+* release 1.0.0
 
 ### Release to Main(Master)
 Working in ```develop``` branch GIT bash\
@@ -67,5 +67,5 @@ add and commit new version in files package.json files\
 ### Wiki
 
 ```bash
-Read about the app on the wiki
+Read about the goodx app on the wiki
 ```
