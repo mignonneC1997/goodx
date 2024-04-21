@@ -43,7 +43,7 @@ export class PatientPage implements OnInit, OnDestroy {
   private destroy$: ReplaySubject<boolean> = new ReplaySubject(1);
 
   constructor(private patientsApi: PatientsService, private toasterService: ToastmessageService,
-    private router: Router, private ionRouterOutlet: IonRouterOutlet, private authApi: AuthService) {
+    private router: Router, ionRouterOutlet: IonRouterOutlet, private authApi: AuthService) {
       this.presentingElement = ionRouterOutlet.nativeEl;
     }
 

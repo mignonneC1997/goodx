@@ -7,7 +7,7 @@ import { catchError, map, timeout } from 'rxjs/operators';
 
 import { environment } from '../../../src/environments/environment';
 import { HttpHeaderService } from './http-headers.service';
-
+import { responseTimeout } from '../../../config';
 
 @Injectable({
   providedIn: 'root'
@@ -16,13 +16,14 @@ export class BookingsService {
   constructor(private http: HttpClient, private httpHeaderService: HttpHeaderService) { }
 
   public bookingWeb = (): Observable<any> => {
-      return this.http.get<any>(environment.urlWeb + 'booking?fields=["entity_uid","diary_uid","booking_type_uid","booking_status_uid","patient_uid","start_time","duration","treating_doctor_uid","reason","invoice_nr","cancelled","debtor","location_uid","meta_data","updated_at"]', { headers: this.httpHeaderService.getHTTPHeaders(), observe: 'response' }).pipe(
+    return this.http.get<any>(environment.urlWeb + 'booking?fields=["entity_uid","diary_uid","booking_type_uid","booking_status_uid","patient_uid","start_time","duration","treating_doctor_uid","reason","invoice_nr","cancelled","debtor","location_uid","meta_data","updated_at"]', { headers: this.httpHeaderService.getHTTPHeaders(), observe: 'response' }).pipe(
+      timeout(responseTimeout),
       map((response: HttpResponse<any>) => {
         return response.body;
       }), catchError((error: HttpErrorResponse) => {
         return throwError(() => error);
       })
-      ); 
+    ); 
   }
 
   public bookingsNative = (): Observable<any> => {
@@ -64,6 +65,7 @@ export class BookingsService {
       }
     }
     return this.http.put<any>(environment.urlWeb + `booking/${uid}`, putData, { headers: this.httpHeaderService.getHTTPHeaders(), observe: 'response' }).pipe(
+      timeout(responseTimeout),
       map((response: HttpResponse<any>) => {
         return response.body;
       }), catchError((error: HttpErrorResponse) => {
@@ -119,6 +121,7 @@ export class BookingsService {
       }
     }
     return this.http.put<any>(environment.urlWeb + `booking/${uid}`, putData, { headers: this.httpHeaderService.getHTTPHeaders(), observe: 'response' }).pipe(
+      timeout(responseTimeout),
       map((response: HttpResponse<any>) => {
         return response.body;
       }), catchError((error: HttpErrorResponse) => {
@@ -161,11 +164,12 @@ export class BookingsService {
 
   public bookingTypesWeb = (): Observable<any> => {
     return this.http.get<any>(environment.urlWeb + 'booking_type?fields=["uid","entity_uid","diary_uid","name","booking_status_uid","disabled","uuid"]', { headers: this.httpHeaderService.getHTTPHeaders(), observe: 'response' }).pipe(
-    map((response: HttpResponse<any>) => {
-      return response.body;
-    }), catchError((error: HttpErrorResponse) => {
-      return throwError(() => error);
-    })
+      timeout(responseTimeout),
+      map((response: HttpResponse<any>) => {
+        return response.body;
+      }), catchError((error: HttpErrorResponse) => {
+        return throwError(() => error);
+      })
     ); 
   }
 
@@ -195,11 +199,12 @@ export class BookingsService {
 
   public bookingStatusWeb = (): Observable<any> => {
     return this.http.get<any>(environment.urlWeb + 'booking_status?fields=["uid","entity_uid","diary_uid","name","next_booking_status_uid","is_arrived","is_final", "disabled"]', { headers: this.httpHeaderService.getHTTPHeaders(), observe: 'response' }).pipe(
-    map((response: HttpResponse<any>) => {
-      return response.body;
-    }), catchError((error: HttpErrorResponse) => {
-      return throwError(() => error);
-    })
+      timeout(responseTimeout),
+      map((response: HttpResponse<any>) => {
+        return response.body;
+      }), catchError((error: HttpErrorResponse) => {
+        return throwError(() => error);
+      })
     ); 
   }
 
@@ -264,11 +269,12 @@ export class BookingsService {
     };
 
     return this.http.post<any>(environment.urlWeb + 'booking', postData, { headers: this.httpHeaderService.getHTTPHeaders(), observe: 'response' }).pipe(
-    map((response: HttpResponse<any>) => {
-      return response.body;
-    }), catchError((error: HttpErrorResponse) => {
-      return throwError(() => error);
-    })
+      timeout(responseTimeout),
+      map((response: HttpResponse<any>) => {
+        return response.body;
+      }), catchError((error: HttpErrorResponse) => {
+        return throwError(() => error);
+      })
     ); 
   }
 
@@ -330,5 +336,4 @@ export class BookingsService {
         }));
     });
   }
-
 }
