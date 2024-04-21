@@ -96,11 +96,7 @@ export class LoginPage implements OnInit, OnDestroy {
           error: (err: ErrorEvent) => {
             this.isLoading = false;
             if (err.error.status !== undefined) {
-              if (err.error.status !== undefined) {
-                this.toasterService.displayErrorToast(err.error.status);
-              } else {
-                this.toasterService.displayErrorToast(err.message);
-              }
+              this.toasterService.displayErrorToast(err.error.status);
             } else {
               this.toasterService.displayErrorToast(err.message);
             }
