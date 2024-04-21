@@ -1,4 +1,4 @@
-# GoodX Assesent (v1.0.0)
+# GoodX Assesent (v1.0.1)
 
 Application which can be used by medical staff (e.g. a doctor or nurse) to get a summary of their daily schedule (diary), as well as perform basic operations on their diary.
  
@@ -52,7 +52,7 @@ z = bug fixes of minor updates
 
 #### Current version
 
-* release 1.0.0
+* release 1.0.1
 
 ### Release to Main(Master)
 Working in ```develop``` branch GIT bash\
