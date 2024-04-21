@@ -10,7 +10,7 @@ import { ReplaySubject, takeUntil } from 'rxjs';
 
 import { BookingsService } from '../../services/bookings.service';
 import { PatientsService } from '../../services/patients.service';
-import { ToastmessageService } from '../../services/toaster.service';
+import { ToasterService } from '../../services/toaster.service';
 import { AuthService } from '../../services/auth.service';
 
 @Component({
@@ -62,7 +62,7 @@ export class BookingsPage implements OnInit, OnDestroy {
   public makeBooking = false;
   private destroy$: ReplaySubject<boolean> = new ReplaySubject(1);
 
-  constructor(private toasterService: ToastmessageService, private formBuilder: FormBuilder,
+  constructor(private toasterService: ToasterService, private formBuilder: FormBuilder,
     private router: Router, ionRouterOutlet: IonRouterOutlet, private authApi: AuthService,
     private bookingService: BookingsService, private patientsApi: PatientsService) {
       this.presentingElement = ionRouterOutlet.nativeEl;

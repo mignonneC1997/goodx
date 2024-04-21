@@ -8,7 +8,7 @@ import { ToastController, AlertController, LoadingController } from '@ionic/angu
   providedIn: 'root'
 })
 
-export class ToastmessageService {
+export class ToasterService {
   constructor(private toast: ToastController, private alertController: AlertController, private route: Router,
     public loadingController: LoadingController, private sanitizer: DomSanitizer) { }
 
