@@ -26,5 +26,28 @@ describe('LoginPage', () => {
     expect(component).toBeTruthy();
   });
 
-  // Add more tests as needed
+  it('should initialize with isLoading false', () => {
+    expect(component.isLoading).toBeFalse();
+  });
+
+  it('should initialize loginForm with username and password controls', () => {
+    expect(component.loginForm.get('username')).toBeTruthy();
+    expect(component.loginForm.get('password')).toBeTruthy();
+  });
+
+  it('should disable login button when form is invalid', () => {
+    component.loginForm.setValue({ username: '', password: '' });
+    expect(component.loginForm.invalid).toBeTrue();
+    const submitButton: HTMLButtonElement = fixture.nativeElement.querySelector('ion-button[type="submit"]');
+    expect(submitButton.disabled).toBeTrue();
+  });
+
+  it('should enable login button when form is valid', () => {
+    // Set valid values for the form controls
+    component.loginForm.setValue({ username: 'test', password: 'password' });
+    fixture.detectChanges();
+    const submitButton: HTMLButtonElement = fixture.nativeElement.querySelector('ion-button[type="submit"]');
+    // Check if the submit button is enabled
+    expect(submitButton.disabled).toBeFalse();
+  });
 });

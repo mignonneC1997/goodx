@@ -5,6 +5,7 @@ import { AppComponent } from './app.component';
 import { HttpClientTestingModule } from '@angular/common/http/testing';
 import { IonRouterOutlet } from '@ionic/angular';
 import { RouterTestingModule } from '@angular/router/testing';
+import { By } from '@angular/platform-browser';
 
 describe('AppComponent', () => {
 

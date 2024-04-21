@@ -26,5 +26,44 @@ describe('DashboardPage', () => {
     expect(component).toBeTruthy();
   });
 
-  // Add more tests as needed
+  it('should initialize with isLoading false', () => {
+    expect(component.isLoading).toBeFalse();
+  });
+
+  it('should render the ion-header with correct content', () => {
+    const ionHeaderElement: HTMLIonHeaderElement | null = fixture.nativeElement.querySelector('ion-header');
+    expect(ionHeaderElement!).toBeTruthy();
+
+    const ionToolbarElement: HTMLIonToolbarElement | null = ionHeaderElement!.querySelector('ion-toolbar');
+    expect(ionToolbarElement!).toBeTruthy();
+
+    // Test the ion-title
+    const ionTitleElement: HTMLIonTitleElement | null = ionToolbarElement!.querySelector('ion-title');
+    expect(ionTitleElement!.textContent).toContain('Welcome');
+
+    // Test the ion-buttons with slot="start"
+    const ionMenuButtonElement: HTMLIonButtonsElement | null = ionToolbarElement!.querySelector('ion-buttons[slot="start"]');
+    expect(ionMenuButtonElement!).toBeTruthy();
+
+    // Test the ion-icon with slot="end"
+    const ionIconElement: HTMLIonIconElement | null = ionToolbarElement!.querySelector('ion-icon[slot="end"]');
+    expect(ionIconElement!).toBeTruthy();
+    expect(ionIconElement!.getAttribute('name')).toBe('location');
+  });
+
+  it('should render the ion-content with correct content', () => {
+    const ionContentElement: HTMLElement | null = fixture.nativeElement.querySelector('ion-content');
+    expect(ionContentElement).toBeTruthy();
+
+    // Test the top part with profile image and user name
+    const topPartElement: HTMLElement | null = ionContentElement!.querySelector('.top-part');
+    expect(topPartElement).toBeTruthy();
+
+    const profilePicElement: HTMLImageElement | null = topPartElement!.querySelector('.profile-pic img');
+    expect(profilePicElement).toBeTruthy();
+    expect(profilePicElement?.src).toContain('male.png');
+
+    const profileNameElement: HTMLElement | null = topPartElement!.querySelector('.profile-name');
+    expect(profileNameElement).toBeTruthy(); // Replace with the actual user name property binding
+  });
 });

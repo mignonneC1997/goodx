@@ -34,5 +34,13 @@ describe('PatientPage', () => {
     expect(component).toBeTruthy();
   });
 
-  // Add more tests as needed
+  it('should initialize with seachbar false', () => {
+    expect(component.seachbar).toBeFalse();
+  });
+
+  it('should toggle seachbar when showSearch is called', () => {
+    const initialSeachbarValue = component.seachbar;
+    component.showSearch();
+    expect(component.seachbar).toBe(!initialSeachbarValue);
+  });
 });
