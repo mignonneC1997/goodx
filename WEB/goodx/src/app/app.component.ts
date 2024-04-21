@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 
-import { StorageService } from './services/storage.service';
 import { AuthService } from './services/auth.service';
 import { webVersion } from '../../config';
 
@@ -12,8 +11,7 @@ import { webVersion } from '../../config';
 export class AppComponent implements OnInit {
   public versionNumber:any = '';
 
-  constructor(private storageService: StorageService, private authApi: AuthService) {
-    storageService.initStorage();
+  constructor(private authApi: AuthService) {
   }
 
   ngOnInit() {

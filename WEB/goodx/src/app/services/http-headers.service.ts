@@ -6,7 +6,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 })
 export class HttpHeaderService {
 
-  constructor(private http: HttpClient) { }
+  constructor() { }
 
   public getHTTPHeaders = () => {
     const httpHeader = new HttpHeaders({

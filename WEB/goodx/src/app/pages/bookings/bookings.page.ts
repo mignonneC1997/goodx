@@ -63,7 +63,7 @@ export class BookingsPage implements OnInit, OnDestroy {
   private destroy$: ReplaySubject<boolean> = new ReplaySubject(1);
 
   constructor(private toasterService: ToastmessageService, private formBuilder: FormBuilder,
-    private router: Router, private ionRouterOutlet: IonRouterOutlet, private authApi: AuthService,
+    private router: Router, ionRouterOutlet: IonRouterOutlet, private authApi: AuthService,
     private bookingService: BookingsService, private patientsApi: PatientsService) {
       this.presentingElement = ionRouterOutlet.nativeEl;
   }

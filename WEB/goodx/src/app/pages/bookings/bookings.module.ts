@@ -16,7 +16,7 @@ import { BookingsPage } from './bookings.page';
     ReactiveFormsModule,
     IonicModule,
     BookingsPageRoutingModule,
-    NgCalendarModule
+    NgCalendarModule,
   ],
   schemas: [
     CUSTOM_ELEMENTS_SCHEMA
